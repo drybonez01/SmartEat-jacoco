@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddPietanza.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.GestionePietanze</a> &gt; <span class="el_source">AddPietanza.java</span></div><h1>AddPietanza.java</h1><pre class="source lang-java linenums">package controller.GestionePietanze;
+
+import model.pietanza.Pietanza;
+import model.pietanza.PietanzaDAO;
+import model.pietanza.PietanzaDAOInterface;
+import model.utente.RuoloUtente;
+import model.utente.Utente;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+/**
+ * Classe che aggiunge una pietanza al database da parte dell'admin.
+ */
+@WebServlet(name = &quot;AddPietanza&quot;, value = &quot;/AddPietanza&quot;)
+@MultipartConfig
+public class AddPietanza extends HttpServlet {
+
+    /**
+     * DAO di Pietanza
+     */
+    private final PietanzaDAOInterface pietanzadao;
+
+
+    /**
+     * Costruttore Vuoto
+     */
+    public AddPietanza() {
+<span class="nc" id="L36">        super();</span>
+<span class="nc" id="L37">        pietanzadao = new PietanzaDAO();</span>
+<span class="nc" id="L38">    }</span>
+
+    /**Costruttore con parametri
+     * @param pietanzadao DAO di Pietanza
+     */
+    public AddPietanza(PietanzaDAOInterface pietanzadao) {
+<span class="nc" id="L44">        super();</span>
+<span class="nc" id="L45">        this.pietanzadao = pietanzadao;</span>
+<span class="nc" id="L46">    }</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L50">        request.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+<span class="nc" id="L51">        HttpSession session=request.getSession();</span>
+<span class="nc" id="L52">        Utente u = (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="nc" id="L53">        Pietanza pietanza = new Pietanza();</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if(u==null)</span>
+<span class="nc" id="L55">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else{
+<span class="nc" id="L57">        RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (!ruoloUtente.isAdmin())</span>
+<span class="nc" id="L59">            response.sendRedirect(request.getContextPath() + &quot;/toHome&quot;);</span>
+        else {
+<span class="nc" id="L61">            Part image = request.getPart(&quot;image&quot;);</span>
+<span class="nc" id="L62">            String nameImage = System.currentTimeMillis() + Paths.get(image.getSubmittedFileName()).getFileName().toString();</span>
+<span class="nc" id="L63">            String uploadPath = System.getenv(&quot;CATALINA_HOME&quot;) + File.separator + &quot;uploads&quot; + File.separator;</span>
+<span class="nc" id="L64">            InputStream stream = image.getInputStream();</span>
+<span class="nc" id="L65">            String linkImmagine = uploadPath + nameImage;</span>
+<span class="nc" id="L66">            File file = new File(linkImmagine);</span>
+            try {
+<span class="nc" id="L68">                Files.copy(stream, file.toPath());</span>
+<span class="nc" id="L69">            } catch (FileAlreadyExistsException e) {</span>
+                /* do nothing */
+<span class="nc" id="L71">            }</span>
+
+<span class="nc" id="L73">            String nome = request.getParameter(&quot;nome&quot;);</span>
+<span class="nc" id="L74">            String descrizione = request.getParameter(&quot;descrizione&quot;);</span>
+<span class="nc" id="L75">            char tipo = request.getParameter(&quot;tipo&quot;).charAt(0);</span>
+<span class="nc" id="L76">            String ingredienti = request.getParameter(&quot;ingredienti&quot;);</span>
+
+<span class="nc" id="L78">            pietanza.setNome(nome);</span>
+<span class="nc" id="L79">            pietanza.setDescrizione(descrizione);</span>
+<span class="nc" id="L80">            pietanza.setTipo(tipo);</span>
+<span class="nc" id="L81">            pietanza.setIngredienti(ingredienti);</span>
+<span class="nc" id="L82">            pietanza.setImmagine(nameImage);</span>
+<span class="nc" id="L83">            pietanza.setNumeroAcquisti(0);</span>
+<span class="nc" id="L84">            this.addPietanza(pietanza);</span>
+
+<span class="nc" id="L86">            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(&quot;/AdminPietanzeArea&quot;);</span>
+<span class="nc" id="L87">            dispatcher.forward(request, response);</span>
+        }
+        }
+<span class="nc" id="L90">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L94">        doGet(request, response);</span>
+<span class="nc" id="L95">    }</span>
+
+    /**Aggiunge una pietanza al database.
+     * @pre {@literal pietanza.nome!=null &amp;&amp; pietanza.descrizione!=null &amp;&amp; pietanza.tipo!=null &amp;&amp;
+     * pietanza.ingredienti!=null &amp;&amp; pietanza.immagine!=null &amp;&amp; pietanza.numeroAcquisti!=null
+     * &amp;&amp; !(pietanza-&gt;includes(pietanza))}
+     * @post {@literal pietanza-&gt;includes(pietanza)}
+     * @param pietanza pietanza da aggiungere al database
+     */
+    public void addPietanza(Pietanza pietanza)
+    {
+<span class="nc" id="L106">        pietanzadao.doSave(pietanza);</span>
+<span class="nc" id="L107">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pietanza.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Pietanza.java</span></div><h1>Pietanza.java</h1><pre class="source lang-java linenums">package model;
+
+
+import java.util.ArrayList;
+
+/**
+ * La classe modella le pietanze.
+ */
+<span class="fc" id="L9">public class Pietanza {</span>
+
+    /**
+     * Il nome identifica una singola pietanza.
+     */
+    private String nome;
+
+    /**
+     * descrizione della pietanza.
+     */
+    private String descrizione;
+
+    /**
+     * tipo della pietanza.
+     */
+    private char tipo;
+
+    /**
+     * ingredienti della pietanza.
+     */
+    private String ingredienti;
+
+    /**
+     * immagine della pietanza.
+     */
+    private String immagine;
+
+    /**
+     * numero di acquisti della pietanza.
+     */
+    private int numeroAcquisti;
+
+
+    /**
+     * ArrayList di servizio per eliminare una pietanza.
+     */
+<span class="fc" id="L45">    private static ArrayList&lt;String&gt; listDeletePietanza=new ArrayList&lt;&gt;();</span>
+
+
+    /** Restituisce il nome della pietanza.
+     * @return
+     * Restituisce il nome della pietanza.
+     */
+<span class="fc" id="L52">    public String getNome() {return nome;}</span>
+
+
+    /**
+     * Imposta il nome della pietanza.
+     * @param nome nome della pietanza.
+     */
+<span class="fc" id="L59">    public void setNome(String nome) {this.nome = nome;}</span>
+
+
+    /** Restituisce la descrizione della pietanza.
+     * @return
+     * Restituisce la descrizione della pietanza.
+     */
+<span class="fc" id="L66">    public String getDescrizione() {return descrizione;}</span>
+
+
+    /**
+     * Imposta la descrizione della pietanza.
+     * @param descrizione descrizione della pietanza.
+     */
+<span class="fc" id="L73">    public void setDescrizione(String descrizione) {this.descrizione = descrizione;}</span>
+
+
+    /** Restituisceil tipo della pietanza.
+     * @return
+     * Restituisce il tipo della pietanza.
+     */
+<span class="fc" id="L80">    public char getTipo() {return tipo;}</span>
+
+
+    /**
+     * Imposta il tipo di piatto della pietanza.
+     * @param tipo tipo di piatto della pietanza.
+     */
+<span class="fc" id="L87">    public void setTipo(char tipo) {this.tipo = tipo;}</span>
+
+
+    /** Restituisce gli ingredienti della pietanza.
+     * @return
+     * Restituisce gli ingredienti della pietanza.
+     */
+<span class="fc" id="L94">    public String getIngredienti() {return ingredienti;}</span>
+
+
+    /**
+     * Imposta gli ingredienti della pietanza.
+     * @param ingredienti ingredienti della pietanza.
+     */
+<span class="fc" id="L101">    public void setIngredienti(String ingredienti) {this.ingredienti = ingredienti;}</span>
+
+
+    /** Restituisce l'immagine della pietanza.
+     * @return
+     * Restituisce l'immagine della pietanza.
+     */
+<span class="fc" id="L108">    public String getImmagine() {return immagine;}</span>
+
+
+    /**
+     * Imposta l'immagine della pietanza.
+     * @param immagine immagine della pietanza.
+     */
+<span class="fc" id="L115">    public void setImmagine(String immagine) {this.immagine = immagine;}</span>
+
+
+    /** Restituisce il numero di acquisti della pietanza.
+     * @return
+     * Restituisce il numero di acquisti della pietanza.
+     */
+<span class="fc" id="L122">    public int getNumeroAcquisti() {return numeroAcquisti;}</span>
+
+
+    /**
+     * Imposta il numero di acquisti della pietanza.
+     * @param numeroAcquisti numero di acquisti della pietanza.
+     */
+<span class="fc" id="L129">    public void setNumeroAcquisti(int numeroAcquisti) {this.numeroAcquisti = numeroAcquisti;}</span>
+
+
+    /**
+     * restituisce i nomi delle pietanza da eliminare
+     * @return lista di nomi di pietanza
+     */
+<span class="nc" id="L136">    public static ArrayList&lt;String&gt; getListDeletePietanza() {return listDeletePietanza;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

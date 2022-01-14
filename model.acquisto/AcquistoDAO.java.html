@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AcquistoDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.acquisto</a> &gt; <span class="el_source">AcquistoDAO.java</span></div><h1>AcquistoDAO.java</h1><pre class="source lang-java linenums">package model.acquisto;
+
+import model.utils.ConPool;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Questa classe DAO implementa un'interfaccia per l'interrogazione al database per i metodi maggiormente usati di Acquisto.
+ */
+<span class="fc" id="L12">public class AcquistoDAO implements AcquistoDAOInterface</span>
+{
+
+    /** Restituisce l'acquisto con una chiave specifica, se presente, altrimenti restituisce un oggetto Acquisto vuoto.
+     * @pre {@literal dataAcquisto!=null &amp;&amp; CF!=null &amp;&amp; codiceMenu!=null}
+     * @post {@literal Acquisto (empty) || acquisto-&gt;select(Acquisto|Acquisto.dataAcquisto==dataAcquisto &amp;&amp; Acquisto.codiceFiscale==codiceFiscale &amp;&amp; Acquisto.codiceMenu==codiceMenu)}
+     * @return Acquisto con la chiave richiesta, se presente
+     */
+    public Acquisto doRetrieveAcquistoByKey(Date dataAcquisto, String CF, int codiceMenu)
+    {
+<span class="fc" id="L22">        Acquisto cat = new Acquisto();</span>
+<span class="fc" id="L23">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L25">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM acquisto WHERE dataAcquisto=? AND codiceFiscale=? AND codiceMenu=?&quot;);</span>
+<span class="fc" id="L26">            ps.setDate(1, dataAcquisto);</span>
+<span class="fc" id="L27">            ps.setString(2, CF);</span>
+<span class="fc" id="L28">            ps.setInt(3, codiceMenu);</span>
+<span class="fc" id="L29">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">            while (rs.next())</span>
+            {
+<span class="fc" id="L32">                cat.setDataAcquisto(rs.getDate(1));</span>
+<span class="fc" id="L33">                cat.setCF(rs.getString(2));</span>
+<span class="fc" id="L34">                cat.setCodiceMenu(rs.getInt(3));</span>
+<span class="fc" id="L35">                cat.setPostoMensa(rs.getBoolean(4));</span>
+            }
+<span class="fc" id="L37">            return cat;</span>
+<span class="nc" id="L38">        } catch (SQLException e) {</span>
+<span class="nc" id="L39">            throw new RuntimeException(e);</span>
+        }
+    }
+
+
+    /** Salva l'acquisto in database.
+     * @pre {@literal acq.dataAcquisto!=null &amp;&amp; acq.codiceFiscale!=null &amp;&amp; acq.codiceMenu!=null &amp;&amp; acq.postoMensa!=null &amp;&amp;
+     * !(acquisto-&gt;includes(acq))}
+     * @post {@literal acquisto-&gt;include(acq)}
+     * @param acq Acquisto da salvare in database
+     */
+    public void doSave(Acquisto acq)
+    {
+<span class="fc" id="L52">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L54">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L55">                    (&quot;INSERT INTO acquisto (dataAcquisto,codiceFiscale,codiceMenu,postoMensa) VALUES(?,?,?,?)&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L57">            ps.setDate(1, acq.getDataAcquisto());</span>
+<span class="fc" id="L58">            ps.setString(2,acq.getCF());</span>
+<span class="fc" id="L59">            ps.setInt(3, acq.getCodiceMenu());</span>
+<span class="fc" id="L60">            ps.setBoolean(4,acq.isPostoMensa());</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="nc" id="L63">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="fc" id="L65">        } catch (SQLException e) {</span>
+<span class="fc" id="L66">            throw new RuntimeException(e);</span>
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">    }</span>
+
+    /** Elimina l'acquisto dal database.
+     * @pre {@literal dataAcquisto!=null &amp;&amp; CF!=null &amp;&amp; codiceMenu!=null
+     * &amp;&amp; acquisto-&gt;exists(a|a.dataAcquisto==dataAcquisto &amp;&amp; a.codiceFiscale==CF &amp;&amp; a.codiceMenu==codiceMenu)}
+     * @post {@literal !acquisto-&gt;exists(a|a.dataAcquisto==dataAcquisto &amp;&amp; a.codiceFiscale==CF &amp;&amp; a.codiceMenu==codiceMenu)}
+     * @param dataAcquisto Data di acquisto
+     * @param CF Codice fiscale
+     * @param codiceMenu chiave che identifica il menu
+     */
+    public void doDelete(Date dataAcquisto, String CF, int codiceMenu)
+    {
+<span class="fc" id="L80">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L82">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L83">                    (&quot;Delete FROM acquisto WHERE dataAcquisto=? AND codiceFiscale=? AND codiceMenu=?&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L85">            ps.setDate(1, dataAcquisto);</span>
+<span class="fc" id="L86">            ps.setString(2, CF);</span>
+<span class="fc" id="L87">            ps.setInt(3, codiceMenu);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="fc" id="L90">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="nc" id="L92">        } catch (SQLException e) {</span>
+<span class="nc" id="L93">            throw new RuntimeException(e);</span>
+<span class="fc" id="L94">        }</span>
+<span class="fc" id="L95">    }</span>
+
+    /** Aggiorna il menu con quella chiave.
+     * @pre {@literal temp.dataAcquisto!=null &amp;&amp; temp.codiceFiscale!=null &amp;&amp; temp.codiceMenu!=null &amp;&amp; temp.postoMensa!=null
+     * &amp;&amp; acquisto-&gt;exists(a|a.dataAcquisto==temp.dataAcquisto &amp;&amp; a.codiceFiscale==temp.codiceFiscale &amp;&amp; a.codiceMenu==temp.codiceMenu)}
+     * @post {@literal acquisto-&gt;includes(temp)}
+     * @param temp Acquisto con la stessa chiave di quello da aggiornare e le nuove informazioni
+     */
+    public void doUpdate(Acquisto temp)
+    {
+<span class="fc" id="L105">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L107">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L108">                    (&quot;UPDATE acquisto SET postoMensa=? WHERE dataAcquisto=? AND codiceFiscale=? AND codiceMenu=?&quot;,</span>
+                    Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L110">            ps.setBoolean(1, temp.isPostoMensa());</span>
+<span class="fc" id="L111">            ps.setDate(2, temp.getDataAcquisto());</span>
+<span class="fc" id="L112">            ps.setString(3, temp.getCF());</span>
+<span class="fc" id="L113">            ps.setInt(4, temp.getCodiceMenu());</span>
+<span class="fc" id="L114">            ps.executeUpdate();</span>
+
+<span class="nc" id="L116">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L118">            throw new RuntimeException(e);</span>
+<span class="fc" id="L119">        }</span>
+<span class="fc" id="L120">    }</span>
+
+    /** Restituisce tutti gli acquisti fatti dall'utente.
+     * @pre {@literal CF!=null}
+     * @post {@literal List=acquisto-&gt;select(a|a.CF=CF)}
+     * @param CF codice fiscale dell'utente di cui si vogliono gli acquisti
+     * @return Lista di acquisti fatti dall'utente
+     */
+    public List&lt;Acquisto&gt; doRetrieveAllAcquistoByCF(String CF)
+    {
+<span class="fc" id="L130">        List&lt;Acquisto&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L131">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L133">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM acquisto where codiceFiscale=?&quot;);</span>
+<span class="fc" id="L134">            ps.setString(1, CF);</span>
+<span class="fc" id="L135">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L137">                Acquisto p = new Acquisto();</span>
+<span class="fc" id="L138">                p.setDataAcquisto(rs.getDate(1));</span>
+<span class="fc" id="L139">                p.setCF(rs.getString(2));</span>
+<span class="fc" id="L140">                p.setCodiceMenu(rs.getInt(3));</span>
+<span class="fc" id="L141">                p.setPostoMensa(rs.getBoolean(4));</span>
+<span class="fc" id="L142">                list.add(p);</span>
+<span class="fc" id="L143">            }</span>
+<span class="fc" id="L144">            return list;</span>
+<span class="nc" id="L145">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L147">            throw new RuntimeException(e);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

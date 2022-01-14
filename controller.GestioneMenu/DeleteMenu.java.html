@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeleteMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.GestioneMenu</a> &gt; <span class="el_source">DeleteMenu.java</span></div><h1>DeleteMenu.java</h1><pre class="source lang-java linenums">package controller.GestioneMenu;
+
+
+import model.mensa.Mensa;
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.utente.RuoloUtente;
+import model.utente.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+
+
+/**
+ * Classe che elimina un menu da parte dell'admin
+ */
+@WebServlet(name = &quot;DeleteMenu&quot;, value = &quot;/DeleteMenu&quot;)
+public class DeleteMenu extends HttpServlet
+{
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+    /**
+     * Costruttore vuoto
+     */
+    public DeleteMenu() {
+<span class="nc" id="L38">        super();</span>
+<span class="nc" id="L39">        menudao=new MenuDAO();</span>
+<span class="nc" id="L40">    }</span>
+
+    /**Costruttore con parametri
+     * @param menudao DAO di Menu
+     */
+    public DeleteMenu(MenuDAOInterface menudao) {
+<span class="fc" id="L46">        super();</span>
+<span class="fc" id="L47">        this.menudao=menudao;</span>
+<span class="fc" id="L48">    }</span>
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L51">        doGet(request, response);</span>
+<span class="nc" id="L52">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L55">        HttpSession session=request.getSession();</span>
+<span class="fc" id="L56">        Utente u = (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if(u==null)</span>
+<span class="fc" id="L58">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else{
+<span class="fc" id="L60">        RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (!ruoloUtente.isAdmin())</span>
+<span class="fc" id="L62">            response.sendRedirect(request.getContextPath() + &quot;/toHome&quot;);</span>
+        else {
+<span class="fc" id="L64">            int codiceMenu = Integer.parseInt(request.getParameter(&quot;codiceMenu&quot;));</span>
+<span class="fc" id="L65">            boolean result = this.deleteMenu(codiceMenu);</span>
+            String message;
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (result)</span>
+<span class="fc" id="L68">                message = &quot;Il menu è stato eliminato correttamente&quot;;</span>
+            else
+<span class="fc" id="L70">                message = &quot;Il menu verrà eliminato dopo l'orario di chiusura&quot;;</span>
+<span class="fc" id="L71">            request.setAttribute(&quot;message&quot;, message);</span>
+<span class="fc" id="L72">            RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMenuArea&quot;);</span>
+<span class="fc" id="L73">            dispatcher.forward(request, response);</span>
+        }
+        }
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Elimina un menu quando possibile
+     * @pre {@literal codiceMenu!=null}
+     * @post {@literal !menu-&gt;exist(m|m.codiceMenu!=codiceMenu)}
+     * @param codiceMenu codice del menu da eliminare
+     * @return true se il menu' e' stato eliminato all'istante, false se elimiato successivamente
+     */
+    public boolean deleteMenu(int codiceMenu)
+    {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (Mensa.isMensaConfig()) {</span>
+<span class="fc" id="L88">            menudao.doDelete(codiceMenu);</span>
+<span class="fc" id="L89">            return true;</span>
+        }
+<span class="fc" id="L91">        ArrayList&lt;Integer&gt; listDeleteMenu = Menu.getListDeleteMenu();</span>
+<span class="fc" id="L92">        listDeleteMenu.add(codiceMenu);</span>
+<span class="fc" id="L93">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ToggleMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ToggleMenu.java</span></div><h1>ToggleMenu.java</h1><pre class="source lang-java linenums">package controller;
+
+
+import model.*;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+
+//un bottone in ShowMenuDetails che cliccato chiama la servlet e cambia lo stato del menu.Reindirizza alla stessa pagina.
+
+/**
+ * Classe che cambia lo stato di disponibilita' di un menu da parte dell'admin
+ */
+
+@WebServlet(name = &quot;ToggleMenu&quot;, value = &quot;/ToggleMenu&quot;)
+public class ToggleMenu extends HttpServlet {
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+    /**
+     * Costruttore Vuoto
+     */
+    public ToggleMenu() {
+<span class="nc" id="L34">        super();</span>
+<span class="nc" id="L35">        menudao=new MenuDAO();</span>
+<span class="nc" id="L36">    }</span>
+
+    /**Costruttore con parametri
+     * @param menudao DAO di Menu
+     */
+    public ToggleMenu(MenuDAOInterface menudao) {
+<span class="fc" id="L42">        super();</span>
+<span class="fc" id="L43">        this.menudao=menudao;</span>
+<span class="fc" id="L44">    }</span>
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L47">        doGet(request, response);</span>
+<span class="nc" id="L48">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L51">        HttpSession session=request.getSession();</span>
+<span class="fc" id="L52">        Utente u = (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(u==null)</span>
+<span class="fc" id="L54">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else{
+<span class="fc" id="L56">        RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (!ruoloUtente.isAdmin())</span>
+<span class="fc" id="L58">            response.sendRedirect(request.getContextPath() + &quot;/toHome&quot;);</span>
+        else {
+<span class="fc" id="L60">            int codiceMenu = Integer.parseInt(request.getParameter(&quot;codiceMenu&quot;));</span>
+<span class="fc" id="L61">            request.setAttribute(&quot;codiceMenu&quot;, codiceMenu);</span>
+<span class="fc" id="L62">            boolean result = this.toggleMenu(codiceMenu);</span>
+            String message;
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (result)</span>
+<span class="fc" id="L65">                message = &quot;La disponibilita' del menu è stata cambiata&quot;;</span>
+            else
+<span class="fc" id="L67">                message = &quot;La disponibilita' del menu verra' aggiornata dopo l'orario di chiusura&quot;;</span>
+<span class="fc" id="L68">            request.setAttribute(&quot;message&quot;, message);</span>
+<span class="fc" id="L69">            RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMenuArea&quot;);</span>
+<span class="fc" id="L70">            dispatcher.forward(request, response);</span>
+        }
+        }
+<span class="fc" id="L73">    }</span>
+
+    /**Cambia la disponibilita' di un menu quando possibile
+     * @pre {@literal codiceMenu!=null}
+     * @param codiceMenu codice del menu a cui cambiare la disponibilita'
+     * @return true se la disponibilita' e' stata cambiata all'istante, false se cambiato successivamente
+     */
+    public boolean toggleMenu(int codiceMenu)
+    {
+<span class="fc" id="L82">        boolean available=menudao.doRetrieveMenuByKey(codiceMenu).isAvailable();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        boolean change=!available;</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (Mensa.isMensaConfig())</span>
+        {
+<span class="fc" id="L86">            menudao.doUpdateAvailable(codiceMenu,change);</span>
+<span class="fc" id="L87">            return  true;</span>
+        }
+<span class="fc" id="L89">        ArrayList&lt;Integer&gt; listToggleMenu= Menu.getListToggleMenu();</span>
+<span class="fc" id="L90">        listToggleMenu.add(codiceMenu);</span>
+<span class="fc" id="L91">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

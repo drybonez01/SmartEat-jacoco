@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminStatsArea.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.StatisticheAcquisti</a> &gt; <span class="el_source">AdminStatsArea.java</span></div><h1>AdminStatsArea.java</h1><pre class="source lang-java linenums">package controller.StatisticheAcquisti;
+
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.pietanza.Pietanza;
+import model.pietanza.PietanzaDAO;
+import model.pietanza.PietanzaDAOInterface;
+import model.utente.RuoloUtente;
+import model.utente.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Classe che implementa la visualizzazione delle statistiche.
+ */
+@WebServlet(name=&quot;AdminStatsArea&quot;, value=&quot;/AdminStatsArea&quot;)
+public class AdminStatsArea extends HttpServlet
+{
+    /**
+     *DAO di Pietanza
+     */
+    private final PietanzaDAOInterface pdao;
+
+    /**
+     *DAO di Menu
+     */
+    private final MenuDAOInterface mdao;
+
+    /**
+     *Costruttore vuoto
+     */
+    public AdminStatsArea() {
+<span class="nc" id="L43">        super();</span>
+<span class="nc" id="L44">        pdao = new PietanzaDAO();</span>
+<span class="nc" id="L45">        mdao=new MenuDAO();</span>
+<span class="nc" id="L46">    }</span>
+
+    /**Costruttore con parametri
+     * @param pdao DAO di Pietanza
+     * @param mdao DAO di Menu
+     */
+    public AdminStatsArea(PietanzaDAOInterface pdao,MenuDAOInterface mdao) {
+<span class="fc" id="L53">        super();</span>
+<span class="fc" id="L54">        this.pdao = pdao;</span>
+<span class="fc" id="L55">        this.mdao=mdao;</span>
+<span class="fc" id="L56">    }</span>
+
+
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L61">        doGet(request,response);</span>
+<span class="nc" id="L62">    }</span>
+
+    public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="fc" id="L66">        request.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L67">        HttpSession session=request.getSession();</span>
+<span class="fc" id="L68">        Utente u= (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if(u==null)</span>
+<span class="fc" id="L70">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else{
+<span class="fc" id="L72">        RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if(!ruoloUtente.isAdmin())</span>
+<span class="fc" id="L74">            response.sendRedirect(request.getContextPath()+&quot;/toHome&quot;);</span>
+        else {
+<span class="fc" id="L76">            List&lt;Pietanza&gt; pietanzas = pdao.doRetrieveAllPietanza();</span>
+<span class="fc" id="L77">            List&lt;Integer&gt; statsMenu = this.mostraStatistiche(pietanzas);</span>
+<span class="fc" id="L78">            request.setAttribute(&quot;pietanze&quot;, pietanzas);</span>
+<span class="fc" id="L79">            request.setAttribute(&quot;statsMenu&quot;, statsMenu);</span>
+
+<span class="fc" id="L81">            RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/WEB-INF/results/admin/adminStatsArea.jsp&quot;);</span>
+<span class="fc" id="L82">            dispatcher.forward(request, response);</span>
+        }
+        }
+<span class="fc" id="L85">    }</span>
+
+
+    /** Restituisce lista di interi che rappresenta il numero di menu in cui, nella lista di input, la pietanza al numero corrispondente è disponibile.
+     * @param array array di tutte le pietanze
+     * @return lista di interi che rappresenta il numero di menu in cui, nella lista di input, la pietanza al numero corrispondente è disponibile.
+     */
+    public List&lt;Integer&gt; mostraStatistiche(List&lt;Pietanza&gt; array) {
+<span class="fc" id="L93">        List&lt;Menu&gt; menus = mdao.doRetrieveAllMenu();</span>
+<span class="fc" id="L94">        List&lt;Integer&gt; counter = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L95">        int i = 0;</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        for (Pietanza x : array) {</span>
+<span class="fc" id="L98">            int temp = 0;</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            for (Menu y : menus) {</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                if (y.getPrimo().equals(x.getNome()))</span>
+<span class="fc" id="L101">                    temp++;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">                else if (y.getSecondo().equals(x.getNome()))</span>
+<span class="fc" id="L103">                    temp++;</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">                else if (y.getDessert().equals(x.getNome()))</span>
+<span class="fc" id="L105">                    temp++;</span>
+<span class="fc" id="L106">            }</span>
+<span class="fc" id="L107">            counter.add(i, temp);</span>
+<span class="fc" id="L108">            i++;</span>
+<span class="fc" id="L109">        }</span>
+<span class="fc" id="L110">        return counter;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

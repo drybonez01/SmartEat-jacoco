@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeletePurchase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.GestioneAcquisti</a> &gt; <span class="el_source">DeletePurchase.java</span></div><h1>DeletePurchase.java</h1><pre class="source lang-java linenums">package controller.GestioneAcquisti;
+
+import model.acquisto.AcquistoDAO;
+import model.acquisto.Acquisto;
+import model.acquisto.AcquistoDAOInterface;
+import model.mensa.Mensa;
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.pietanza.Pietanza;
+import model.pietanza.PietanzaDAO;
+import model.pietanza.PietanzaDAOInterface;
+import model.tessera.Tessera;
+import model.tessera.TesseraDAO;
+import model.tessera.TesseraDAOInterface;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Date;
+
+/**
+ * Questa classe elimina un acquisto ed effettua il rimborso se possibile.
+ */
+@WebServlet(name=&quot;DeletePurchase&quot;, value=&quot;/DeletePurchase&quot;)
+public class DeletePurchase extends HttpServlet
+{
+
+    /**
+     * DAO di Tessera
+     */
+    private final TesseraDAOInterface tdao;
+
+
+    /**
+     * DAO di Acquisto
+     */
+    private final AcquistoDAOInterface acquistodao;
+
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+
+    /**
+     * DAO di Pietanza
+     */
+    private final PietanzaDAOInterface pdao;
+
+    /**
+     * Costruttore vuoto
+     */
+    public DeletePurchase() {
+<span class="nc" id="L60">        super();</span>
+<span class="nc" id="L61">        tdao = new TesseraDAO();</span>
+<span class="nc" id="L62">        acquistodao=new AcquistoDAO();</span>
+<span class="nc" id="L63">        menudao=new MenuDAO();</span>
+<span class="nc" id="L64">        pdao=new PietanzaDAO();</span>
+<span class="nc" id="L65">    }</span>
+
+
+    /**Costruttore con parametri
+     * @param tdao DAO di Tessera
+     * @param acquistodao DAO di Acquisto
+     * @param menudao DAO di Menu
+     * @param pdao DAO di Pietanza
+     */
+    public DeletePurchase(TesseraDAOInterface tdao,AcquistoDAOInterface acquistodao,MenuDAOInterface menudao,PietanzaDAOInterface pdao) {
+<span class="nc" id="L75">        super();</span>
+<span class="nc" id="L76">        this.tdao = tdao;</span>
+<span class="nc" id="L77">        this.acquistodao=acquistodao;</span>
+<span class="nc" id="L78">        this.menudao=menudao;</span>
+<span class="nc" id="L79">        this.pdao=pdao;</span>
+<span class="nc" id="L80">    }</span>
+
+
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L85">        doGet(request,response);</span>
+<span class="nc" id="L86">    }</span>
+
+    public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L90">        String[] message=new String[2];</span>
+<span class="nc" id="L91">        Date data= Date.valueOf(request.getParameter(&quot;dataAcquisto&quot;));</span>
+<span class="nc" id="L92">        String CF=request.getParameter(&quot;CF&quot;);</span>
+<span class="nc" id="L93">        int codiceMenu= Integer.parseInt(request.getParameter(&quot;codiceMenu&quot;));</span>
+<span class="nc" id="L94">        boolean refund=this.Rimborso(codiceMenu,CF,data,message);</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if(refund)</span>
+<span class="nc" id="L96">            request.setAttribute(&quot;message&quot;,message[1]);</span>
+        else
+<span class="nc" id="L98">            request.setAttribute(&quot;message&quot;,message[0]);</span>
+
+<span class="nc" id="L100">        RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/WEB-INF/results/mensa/home.jsp&quot;);</span>
+<span class="nc" id="L101">        dispatcher.forward(request, response);</span>
+<span class="nc" id="L102">    }</span>
+
+    /** Restituisce un booleano che conferma l'eliminazione dell'acquisto e rimborso oppure segnala un errore.
+     * @pre {@literal codiceMenu!=null &amp;&amp; CF!=null &amp;&amp; data!=null}
+     * @post {@literal !acquisto-&gt;exists(a|a.dataAcquisto==dataAcquisto &amp;&amp; a.codiceFiscale==CF &amp;&amp; a.codiceMenu==codiceMenu)}
+     * @param codiceMenu codice del menu
+     * @param CF codice fiscale
+     * @param data data dell'acquisto
+     * @param message array di stringhe con messaggi di errore o conferma.
+     * @return booleano di conferma rimborso o errore.
+     */
+    public boolean Rimborso(int codiceMenu, String CF, Date data, String[] message )
+    {
+<span class="nc" id="L115">        Menu menu=menudao.doRetrieveMenuByKey(codiceMenu);</span>
+<span class="nc" id="L116">        Acquisto acquisto= acquistodao.doRetrieveAcquistoByKey(data,CF,codiceMenu);</span>
+
+<span class="nc" id="L118">        long actual=System.currentTimeMillis();</span>
+<span class="nc" id="L119">        Date actualDate = new Date(actual);</span>
+
+<span class="nc bnc" id="L121" title="All 4 branches missed.">        if (Mensa.isMensaPurchase() &amp;&amp; acquisto.getDataAcquisto().toString().equals(actualDate.toString()))</span>
+<span class="nc" id="L122">            acquisto.setRefund(true);</span>
+<span class="nc" id="L123">        else acquisto.setRefund(false);</span>
+
+<span class="nc" id="L125">        Tessera tessera=tdao.doRetrieveTesseraByKey(CF);</span>
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if(acquisto.isRefund())</span>
+        {
+<span class="nc" id="L129">            tessera.setSaldo(tessera.getSaldo()+menu.getPrezzo());</span>
+<span class="nc" id="L130">            tdao.doUpdate(tessera);</span>
+<span class="nc" id="L131">            acquistodao.doDelete(data,CF,codiceMenu);</span>
+
+<span class="nc" id="L133">            Pietanza primo= pdao.doRetrievePietanzaByKey(menu.getPrimo());</span>
+<span class="nc" id="L134">            Pietanza secondo= pdao.doRetrievePietanzaByKey(menu.getSecondo());</span>
+<span class="nc" id="L135">            Pietanza dessert= pdao.doRetrievePietanzaByKey(menu.getDessert());</span>
+<span class="nc" id="L136">            primo.setNumeroAcquisti(primo.getNumeroAcquisti()-1);</span>
+<span class="nc" id="L137">            secondo.setNumeroAcquisti(primo.getNumeroAcquisti()-1);</span>
+<span class="nc" id="L138">            dessert.setNumeroAcquisti(primo.getNumeroAcquisti()-1);</span>
+<span class="nc" id="L139">            pdao.doUpdate(primo);</span>
+<span class="nc" id="L140">            pdao.doUpdate(secondo);</span>
+<span class="nc" id="L141">            pdao.doUpdate(dessert);</span>
+
+<span class="nc" id="L143">            message[1]=&quot;Rimborso effettuato con successo&quot;;</span>
+<span class="nc" id="L144">            return true;</span>
+        }
+        else
+        {
+<span class="nc" id="L148">            message[0]=&quot;Rimborso non effettuato perché il tempo per il rimborso è scaduto.&quot;;</span>
+<span class="nc" id="L149">            return false;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

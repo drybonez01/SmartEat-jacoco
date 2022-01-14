@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Login.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.GestioneAutenticazione</a> &gt; <span class="el_source">Login.java</span></div><h1>Login.java</h1><pre class="source lang-java linenums">package controller.GestioneAutenticazione;
+
+import model.mensa.Mensa;
+import model.utils.Check;
+import model.utils.Esito;
+import model.utente.Utente;
+import model.utente.UtenteDAO;
+import model.utente.UtenteDAOInterface;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+
+/**
+ * Classe che implementa il login al sistema.
+ */
+@WebServlet(name = &quot;Login&quot;, value = &quot;/Login&quot;)
+public class Login extends HttpServlet {
+
+    /**
+     * DAO di Utente
+     */
+    private final UtenteDAOInterface udao;
+
+
+    /**
+     * Costruttore vuoto
+     */
+    public Login() {
+<span class="nc" id="L35">        super();</span>
+<span class="nc" id="L36">        udao = new UtenteDAO();</span>
+<span class="nc" id="L37">    }</span>
+
+    /**Costruttore con parametri
+     * @param udao DAO di Utente
+     */
+    public Login(UtenteDAOInterface udao) {
+<span class="fc" id="L43">        super();</span>
+<span class="fc" id="L44">        this.udao = udao;</span>
+<span class="fc" id="L45">    }</span>
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L48">        String[] strings = new String[2];</span>
+<span class="fc" id="L49">        HttpSession session= request.getSession();</span>
+<span class="fc" id="L50">        String resp = &quot;/WEB-INF/results/mensa/home.jsp&quot;;</span>
+<span class="fc" id="L51">        String mail = request.getParameter(&quot;mail&quot;);</span>
+<span class="fc" id="L52">        String password = request.getParameter(&quot;password&quot;);</span>
+<span class="fc" id="L53">        Utente user = this.login(mail, password, strings);</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (user.getCF() == null) {</span>
+<span class="fc" id="L56">            String err = &quot;Dati utente scorretti&quot;;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">            if (strings[1] != null)</span>
+<span class="fc" id="L58">                err = err + &quot;: &quot; + strings[1];</span>
+<span class="fc" id="L59">            resp = &quot;login.jsp&quot;;</span>
+<span class="fc" id="L60">            request.setAttribute(&quot;logError&quot;, err);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        } else if (!(strings[0] == null)) {</span>
+<span class="fc" id="L62">            resp = &quot;login.jsp&quot;;</span>
+<span class="fc" id="L63">            request.setAttribute(&quot;logError&quot;, strings[0]);</span>
+        } else
+<span class="fc" id="L65">            session.setAttribute(&quot;utenteSessione&quot;, user);</span>
+<span class="fc" id="L66">        session.setAttribute(&quot;nomeMensa&quot;, Mensa.mensa.getNome());</span>
+<span class="fc" id="L67">        session.setAttribute(&quot;postiMensa&quot;, Mensa.mensa.getPostiDisponibili());</span>
+<span class="fc" id="L68">        session.setAttribute(&quot;aperturaMensa&quot;, Mensa.mensa.getOrarioApertura());</span>
+<span class="fc" id="L69">        session.setAttribute(&quot;chiusuraMensa&quot;, Mensa.mensa.getOrarioChiusura());</span>
+<span class="fc" id="L70">        session.setAttribute(&quot;postiVuoti&quot;,Mensa.getPostiVuoti());</span>
+<span class="fc" id="L71">        RequestDispatcher dispatcher = request.getRequestDispatcher(resp);</span>
+<span class="fc" id="L72">        dispatcher.forward(request, response);</span>
+<span class="fc" id="L73">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L76">        doPost(request, response);</span>
+<span class="nc" id="L77">    }</span>
+
+    /**
+     * Questo metodo verifica che l'utente sia salvato nel database.
+     *
+     * @param mail     Mail dell'utente
+     * @param password Password dell'utente
+     * @return Utente (empty) se vi sono errori nella richiesta login oppure l'utente non esiste,
+     * altrimenti restituisce le informazioni dell'Utente
+     * @post {@literal Utente (empty) || utente-&gt;select(u|u.email=email &amp;&amp; u.password==password}
+     */
+    public Utente login(String mail, String password, String[] strings) {
+        Esito res;
+
+<span class="fc" id="L91">        res = Check.mailIsValidLogin(mail);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (!res.isValido()) {</span>
+<span class="fc" id="L93">            strings[1] = res.getMessage();</span>
+<span class="fc" id="L94">            return new Utente();</span>
+        }
+
+<span class="fc" id="L97">        res = Check.passwordIsValid(password, password);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (!res.isValido()) {</span>
+<span class="fc" id="L99">            strings[1] = res.getMessage();</span>
+<span class="fc" id="L100">            return new Utente();</span>
+        }
+
+<span class="fc" id="L103">        Utente u = udao.doRetrieveUtenteByEmailPassword(mail, password);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        if (!u.isAccepted())</span>
+<span class="fc" id="L105">            strings[0] = &quot;L'amministratore non ha ancora accettato la tua richiesta di registrazione.&quot;;</span>
+<span class="fc" id="L106">        return u;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

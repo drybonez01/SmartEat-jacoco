@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SignUp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">SignUp.java</span></div><h1>SignUp.java</h1><pre class="source lang-java linenums">package controller;
+
+
+import model.*;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Date;
+
+/**
+ * Classe che permette all'utente di inviare una richiesta di registrazione.
+ */
+@WebServlet(name=&quot;SignUp&quot;, value=&quot;/SignUp&quot;)
+public class SignUp extends HttpServlet {
+
+    /**
+     * DAO di Utente
+     */
+    private final UtenteDAOInterface dao;
+
+    /**
+     * Costruttore Vuoto
+     */
+    public SignUp() {
+<span class="nc" id="L30">        super();</span>
+<span class="nc" id="L31">        dao = new UtenteDAO();</span>
+<span class="nc" id="L32">    }</span>
+    /**Costruttore con parametri
+     * @param dao DAO di Utente
+     */
+    public SignUp(UtenteDAOInterface dao) {
+<span class="fc" id="L37">        super();</span>
+<span class="fc" id="L38">        this.dao = dao;</span>
+<span class="fc" id="L39">    }</span>
+
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="fc" id="L44">        String url=&quot;login.jsp&quot;;</span>
+<span class="fc" id="L45">        String CF = request.getParameter(&quot;CF&quot;);</span>
+<span class="fc" id="L46">        String nome = request.getParameter(&quot;nome_utente&quot;);</span>
+<span class="fc" id="L47">        String cognome = request.getParameter(&quot;cognome&quot;);</span>
+<span class="fc" id="L48">        String g = request.getParameter(&quot;gender&quot;);</span>
+<span class="fc" id="L49">        String dataTemp=request.getParameter(&quot;dataDiNascita&quot;);</span>
+<span class="fc" id="L50">        Date nascita = null;</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if(!dataTemp.isEmpty())</span>
+<span class="fc" id="L52">             nascita = Date.valueOf(dataTemp);</span>
+<span class="fc" id="L53">        String luogo = request.getParameter(&quot;luogoDiNascita&quot;);</span>
+<span class="fc" id="L54">        String mail = request.getParameter(&quot;mail&quot;);</span>
+<span class="fc" id="L55">        String residenza = request.getParameter(&quot;residenza&quot;);</span>
+<span class="fc" id="L56">        String password = request.getParameter(&quot;password&quot;);</span>
+<span class="fc" id="L57">        String passwordCheck = request.getParameter(&quot;passwordCheck&quot;);</span>
+<span class="fc" id="L58">        String message=this.registrazione(CF,nome,cognome,g,nascita,luogo,mail,residenza,password,passwordCheck);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if(!message.equals(&quot;&quot;))</span>
+<span class="fc" id="L60">            url=&quot;signUp.jsp&quot;;</span>
+<span class="fc" id="L61">        else message=&quot;Richiesta di registrazione avvenuta con successo&quot;;</span>
+<span class="fc" id="L62">        request.setAttribute(&quot;message&quot;,message);</span>
+<span class="fc" id="L63">        RequestDispatcher dispatcher = request.getRequestDispatcher(url);</span>
+<span class="fc" id="L64">        dispatcher.forward(request, response);</span>
+<span class="fc" id="L65">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L68">        doPost(request, response);</span>
+<span class="nc" id="L69">    }</span>
+
+    /** Metodo che o salva una richiesta di registrazione in database e restituisce una stringa di conferma,
+     * oppure restituisce una stringa di errore nel caso di input errato.
+     * @param CF Codice fiscale dell'utente
+     * @param nome Nome dell'utente
+     * @param cognome Cognome dell'utente
+     * @param gender sesso dell'utente
+     * @param nascita data di nascita dell'utente
+     * @param luogo luogo di nascita dell'utente
+     * @param mail mail dell'utente
+     * @param residenza residenza dell'utente
+     * @param password password dell'utente
+     * @param passwordCheck campo Conferma password
+     * @return Stringa di conferma di avvenuto salvataggio o di errore.
+     */
+
+    public String registrazione(String CF, String nome, String cognome, String gender, Date nascita,String luogo, String mail, String residenza, String password, String passwordCheck)
+    {
+<span class="fc" id="L88">        String error=&quot;&quot;;</span>
+        Esito res;
+
+<span class="fc" id="L91">        res=Check.CFIsValid(CF);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L94">            error= res.getMessage();</span>
+<span class="fc" id="L95">            return error;</span>
+        }
+
+<span class="fc" id="L98">        res=Check.nomeIsValid(nome);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L101">            error= res.getMessage();</span>
+<span class="fc" id="L102">            return error;</span>
+        }
+
+<span class="fc" id="L105">        res=Check.cognomeIsValid(cognome);</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L108">            error= res.getMessage();</span>
+<span class="fc" id="L109">            return error;</span>
+        }
+
+<span class="fc" id="L112">        res=Check.sessoIsValid(gender);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L115">            error= res.getMessage();</span>
+<span class="fc" id="L116">            return error;</span>
+        }
+
+<span class="fc" id="L119">        res=Check.nascitaIsValid(nascita);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L122">            error= res.getMessage();</span>
+<span class="fc" id="L123">            return error;</span>
+        }
+
+<span class="fc" id="L126">        res=Check.luogoDNIsValid(luogo);</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L129">            error= res.getMessage();</span>
+<span class="fc" id="L130">            return error;</span>
+        }
+
+<span class="fc" id="L133">        res=Check.mailIsValidReg(mail);</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L136">            error= res.getMessage();</span>
+<span class="fc" id="L137">            return error;</span>
+        }
+
+<span class="fc" id="L140">        res=Check.residenzaIsValid(residenza);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L143">            error= res.getMessage();</span>
+<span class="fc" id="L144">            return error;</span>
+        }
+
+<span class="fc" id="L147">        res=Check.passwordIsValid(password,passwordCheck);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (!res.isValido())</span>
+        {
+<span class="fc" id="L150">            error= res.getMessage();</span>
+<span class="fc" id="L151">            return error;</span>
+        }
+
+<span class="fc" id="L154">            Utente user = new Utente();</span>
+<span class="fc" id="L155">            user.setCF(CF);</span>
+<span class="fc" id="L156">            user.setNome(nome);</span>
+<span class="fc" id="L157">            user.setCognome(cognome);</span>
+<span class="fc" id="L158">            user.setSesso(gender.charAt(0));</span>
+<span class="fc" id="L159">            user.setDataDiNascita(nascita);</span>
+<span class="fc" id="L160">            user.setLuogoDiNascita(luogo);</span>
+<span class="fc" id="L161">            user.setEmail(mail);</span>
+<span class="fc" id="L162">            user.setResidenza(residenza);</span>
+<span class="fc" id="L163">            user.setPasswordHash(password);</span>
+<span class="fc" id="L164">            RuoloUtente standard = new RuoloStandard();</span>
+<span class="fc" id="L165">            user.setAmministratore(standard);</span>
+<span class="fc" id="L166">            user.setAccepted(false);</span>
+<span class="fc" id="L167">            dao.doSave(user);</span>
+<span class="fc" id="L168">            return error;</span>
+    }
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

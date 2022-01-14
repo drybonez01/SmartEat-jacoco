@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.utente</a> &gt; <span class="el_source">UtenteDAO.java</span></div><h1>UtenteDAO.java</h1><pre class="source lang-java linenums">package model.utente;
+
+import model.utils.ConPool;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Questa classe DAO implementa un'interfaccia per l'interrogazione al database per i metodi maggiormente usati di Utente.
+ */
+<span class="fc" id="L12">public class UtenteDAO implements UtenteDAOInterface</span>
+{
+
+    /** Restituisce una lista con tutti gli utenti salvati.
+     * @post {@literal List=utente-&gt;asSet()}
+     * @return Lista di tutti gli utenti salvati
+     */
+    public List&lt;Utente&gt; doRetrieveAllUtente()
+    {
+<span class="fc" id="L21">        List&lt;Utente&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L22">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L24">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM utente&quot;);</span>
+<span class="fc" id="L25">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L27">                Utente u = new Utente();</span>
+<span class="fc" id="L28">                u.setCF(rs.getString(1));</span>
+<span class="fc" id="L29">                u.setNome(rs.getString(2));</span>
+<span class="fc" id="L30">                u.setCognome(rs.getString(3));</span>
+<span class="fc" id="L31">                u.setSesso(rs.getString(4).toCharArray()[0]);</span>
+<span class="fc" id="L32">                u.setDataDiNascita(rs.getDate(5));</span>
+<span class="fc" id="L33">                u.setLuogoDiNascita(rs.getString(6));</span>
+<span class="fc" id="L34">                u.setEmail(rs.getString(7));</span>
+<span class="fc" id="L35">                u.setResidenza(rs.getString(8));</span>
+<span class="fc" id="L36">                u.setPasswordHash(rs.getString(9));</span>
+<span class="fc" id="L37">                boolean us=(rs.getBoolean(10));</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">                if(us)</span>
+<span class="fc" id="L39">                    u.setAmministratore(new RuoloAdmin());</span>
+                else
+<span class="fc" id="L41">                    u.setAmministratore(new RuoloStandard());</span>
+<span class="fc" id="L42">                u.setAccepted(rs.getBoolean(11));</span>
+<span class="fc" id="L43">                list.add(u);</span>
+<span class="fc" id="L44">            }</span>
+<span class="fc" id="L45">            return list;</span>
+<span class="nc" id="L46">        } catch (SQLException e) {</span>
+<span class="nc" id="L47">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /** Restituisce l'utente con la chiave specificata, se presente, altrimenti restituisce un oggetto Utente vuoto.
+     * @pre {@literal CF!=null}
+     * @post {@literal Utente (empty) || utente-&gt;select(u|u.codiceFiscale==CF)}
+     * @param CF Codice fiscale dell'utente. Lo identifica univocamente.
+     * @return Utente con la chiave specificata.
+     */
+    public Utente doRetrieveUtenteByKey(String CF)
+    {
+<span class="fc" id="L59">        Utente u = new Utente();</span>
+<span class="fc" id="L60">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L62">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM utente WHERE codiceFiscale=?&quot;);</span>
+<span class="fc" id="L63">            ps.setString(1, CF);</span>
+<span class="fc" id="L64">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L66">                u.setCF(rs.getString(1));</span>
+<span class="fc" id="L67">                u.setNome(rs.getString(2));</span>
+<span class="fc" id="L68">                u.setCognome(rs.getString(3));</span>
+<span class="fc" id="L69">                u.setSesso(rs.getString(4).toCharArray()[0]);</span>
+<span class="fc" id="L70">                u.setDataDiNascita(rs.getDate(5));</span>
+<span class="fc" id="L71">                u.setLuogoDiNascita(rs.getString(6));</span>
+<span class="fc" id="L72">                u.setEmail(rs.getString(7));</span>
+<span class="fc" id="L73">                u.setResidenza(rs.getString(8));</span>
+<span class="fc" id="L74">                u.setPasswordHash(rs.getString(9));</span>
+<span class="fc" id="L75">                boolean us=(rs.getBoolean(10));</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                if(us)</span>
+<span class="fc" id="L77">                    u.setAmministratore(new RuoloAdmin());</span>
+                else
+<span class="fc" id="L79">                    u.setAmministratore(new RuoloStandard());</span>
+<span class="fc" id="L80">                u.setAccepted(rs.getBoolean(11));</span>
+<span class="fc" id="L81">            }</span>
+<span class="fc" id="L82">            return u;</span>
+<span class="nc" id="L83">        } catch (SQLException e) {</span>
+<span class="nc" id="L84">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /** Salva un utente in database.
+     * @pre {@literal u.codiceFiscale!=null &amp;&amp; u.nome!=null &amp;&amp; u.cognome!=null &amp;&amp; u.sesso!=null &amp;&amp; u.dataDiNascita!=null, u.luogoDiNascita!=null
+     * &amp;&amp; u.email!=null &amp;&amp; u.residenza!=null &amp;&amp; u.password!=null &amp;&amp; u.amministratore!=null &amp;&amp; u.accepted!=null
+     * &amp;&amp; !(utente-&gt;includes(u))}
+     * @post {@literal utente-&gt;includes(u)}
+     * @param u Utente da salvare in database.
+     */
+    public void doSave(Utente u)
+    {
+<span class="fc" id="L97">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L99">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L100">                    (&quot;INSERT INTO utente(CODICEFISCALE, NOME, COGNOME, SESSO, DATADINASCITA, LUOGODINASCITA, &quot; +</span>
+                                    &quot;EMAIL, RESIDENZA, PASSWORD, AMMINISTRATORE, ACCEPTED) VALUES(?,?,?,?,?,?,?,?,?,?,?)&quot;,
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L103">            ps.setString(1, u.getCF());</span>
+<span class="fc" id="L104">            ps.setString(2,u.getNome());</span>
+<span class="fc" id="L105">            ps.setString(3, u.getCognome());</span>
+<span class="fc" id="L106">            ps.setString(4, Character.toString(u.getSesso()));</span>
+<span class="fc" id="L107">            ps.setDate(5, u.getDataDiNascita());</span>
+<span class="fc" id="L108">            ps.setString(6,u.getLuogoDiNascita());</span>
+<span class="fc" id="L109">            ps.setString(7, u.getEmail());</span>
+<span class="fc" id="L110">            ps.setString(8,u.getResidenza());</span>
+<span class="fc" id="L111">            ps.setString(9, u.getPassword());</span>
+<span class="fc" id="L112">            RuoloUtente us=u.isAmministratore();</span>
+<span class="fc" id="L113">            ps.setBoolean(10,us.isAdmin());</span>
+<span class="fc" id="L114">            ps.setBoolean(11, u.isAccepted());</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="nc" id="L117">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="fc" id="L119">        } catch (SQLException e) {</span>
+<span class="fc" id="L120">            throw new RuntimeException(e);</span>
+<span class="fc" id="L121">        }</span>
+<span class="fc" id="L122">    }</span>
+
+    /** Elimina un utente.
+     * @pre {@literal CF!=null &amp;&amp; utente-&gt;exists(u|u.codiceFiscale==CF)}
+     * @post {@literal !(utente-&gt;exists(u|u.codiceFiscale==CF))}
+     * @param CF Codice fiscale dell'utente da eliminare.
+     */
+    public void doDelete(String CF)
+    {
+<span class="fc" id="L131">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L133">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L134">                    (&quot;Delete FROM utente WHERE codiceFiscale=?&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L136">            ps.setString(1, CF);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="fc" id="L139">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="nc" id="L141">        } catch (SQLException e) {</span>
+<span class="nc" id="L142">            throw new RuntimeException(e);</span>
+<span class="fc" id="L143">        }</span>
+<span class="fc" id="L144">    }</span>
+
+    /** Aggiorna tutte le informazioni dell'utente
+     * @pre {@literal u.codiceFiscale!=null &amp;&amp; u.nome!=null &amp;&amp; u.cognome!=null &amp;&amp; u.sesso!=null &amp;&amp; u.dataDiNascita!=null, u.luogoDiNascita!=null
+     * &amp;&amp; u.email!=null &amp;&amp; u.residenza!=null &amp;&amp; u.password!=null &amp;&amp; u.amministratore!=null &amp;&amp; u.accepted!=null
+     * &amp;&amp; utente-&gt;exists(ut|ut.codiceFiscale==u.codiceFiscale)}
+     * @post {@literal utente-&gt;includes(u)}
+     * @param u Utente con la stessa chiave di quello da aggiornare e le nuove informazioni
+     */
+    public void doUpdate(Utente u)
+    {
+<span class="fc" id="L155">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L157">            PreparedStatement ps = con.prepareStatement(&quot;UPDATE utente SET nome=?, cognome=?, sesso=?, dataDiNascita=?, luogoDiNascita=?, email=?, residenza=?, password=?, amministratore=?, accepted=? WHERE codiceFiscale=?&quot;,</span>
+                    Statement.RETURN_GENERATED_KEYS);
+
+<span class="fc" id="L160">            ps.setString(1,u.getNome());</span>
+<span class="fc" id="L161">            ps.setString(2, u.getCognome());</span>
+<span class="fc" id="L162">            ps.setString(3, Character.toString(u.getSesso()));</span>
+<span class="fc" id="L163">            ps.setDate(4, u.getDataDiNascita());</span>
+<span class="fc" id="L164">            ps.setString(5,u.getLuogoDiNascita());</span>
+<span class="fc" id="L165">            ps.setString(6, u.getEmail());</span>
+<span class="fc" id="L166">            ps.setString(7,u.getResidenza());</span>
+<span class="fc" id="L167">            ps.setString(8, u.getPassword());</span>
+<span class="fc" id="L168">            RuoloUtente us=u.isAmministratore();</span>
+<span class="fc" id="L169">            ps.setBoolean(9,us.isAdmin());</span>
+<span class="fc" id="L170">            ps.setBoolean(10, u.isAccepted());</span>
+<span class="fc" id="L171">            ps.setString(11, u.getCF());</span>
+
+<span class="fc" id="L173">            ps.executeUpdate();</span>
+
+<span class="fc" id="L175">        } catch (SQLException e)</span>
+        {
+<span class="fc" id="L177">            throw new RuntimeException(e);</span>
+<span class="fc" id="L178">        }</span>
+<span class="fc" id="L179">    }</span>
+
+    /** Aggiorna tutte e sole le informazioni dell'utente che questi può modificare.
+     * @pre {@literal u.codiceFiscale!=null &amp;&amp; u.nome!=null &amp;&amp; u.cognome!=null &amp;&amp; u.sesso!=null &amp;&amp; u.dataDiNascita!=null, u.luogoDiNascita!=null
+     * &amp;&amp; &amp;&amp; u.residenza!=null &amp;&amp; u.password!=null &amp;&amp; utente-&gt;exists(ut|ut.codiceFiscale==u.codiceFiscale)}
+     * @post {@literal utente-&gt;exists(ut|ut.nome==u.nome &amp;&amp; ut.cognome==u.cognome &amp;&amp; ut.sesso==u.sesso &amp;&amp; ut.codiceFiscale==u.codiceFiscale &amp;&amp; ut.dataDiNascita==u.dataDiNascita
+     * &amp;&amp; ut.luogoDiNascita==u.luogoDiNascita &amp;&amp; ut.residenza==u.residenza &amp;&amp; ut.password==u.password)}
+     * @param u Utente con la stessa chiave di quello da aggiornare e le nuove informazioni.
+     */
+    public void doUpdateUtenteInfo(Utente u)
+    {
+<span class="nc" id="L190">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="nc" id="L192">            PreparedStatement ps = con.prepareStatement(&quot;UPDATE utente SET nome=?, cognome=?, sesso=?, dataDiNascita=?, luogoDiNascita=?, residenza=?, password=? WHERE codiceFiscale=?&quot;,</span>
+                    Statement.RETURN_GENERATED_KEYS);
+
+<span class="nc" id="L195">            ps.setString(1,u.getNome());</span>
+<span class="nc" id="L196">            ps.setString(2, u.getCognome());</span>
+<span class="nc" id="L197">            ps.setString(3, Character.toString(u.getSesso()));</span>
+<span class="nc" id="L198">            ps.setDate(4, u.getDataDiNascita());</span>
+<span class="nc" id="L199">            ps.setString(5,u.getLuogoDiNascita());</span>
+<span class="nc" id="L200">            ps.setString(6,u.getResidenza());</span>
+<span class="nc" id="L201">            ps.setString(7, u.getPassword());</span>
+<span class="nc" id="L202">            ps.setString(8, u.getCF());</span>
+
+<span class="nc" id="L204">            ps.executeUpdate();</span>
+
+<span class="nc" id="L206">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L208">            throw new RuntimeException(e);</span>
+<span class="nc" id="L209">        }</span>
+<span class="nc" id="L210">    }</span>
+
+    /** Restituisce un utente con email e password specificate, se presente, altrimenti restituisce un oggetto Utente vuoto.
+     * @pre {@literal email!=null &amp;&amp; password!=null}
+     * @post {@literal Utente (empty) || utente-&gt;select(u|u.email=email &amp;&amp; u.password==password)}
+     * @param email Email dell'utente
+     * @param password Password dell'utente
+     * @return Utente con email e password specificate.
+     */
+    public Utente doRetrieveUtenteByEmailPassword(String email, String password)
+    {
+<span class="fc" id="L221">        Utente u = new Utente();</span>
+<span class="fc" id="L222">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L224">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM utente WHERE email=? AND password=SHA1(?)&quot;);</span>
+<span class="fc" id="L225">            ps.setString(1, email);</span>
+<span class="fc" id="L226">            ps.setString(2, password);</span>
+<span class="fc" id="L227">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L229">                u.setCF(rs.getString(1));</span>
+<span class="fc" id="L230">                u.setNome(rs.getString(2));</span>
+<span class="fc" id="L231">                u.setCognome(rs.getString(3));</span>
+<span class="fc" id="L232">                u.setSesso(rs.getString(4).toCharArray()[0]);</span>
+<span class="fc" id="L233">                u.setDataDiNascita(rs.getDate(5));</span>
+<span class="fc" id="L234">                u.setLuogoDiNascita(rs.getString(6));</span>
+<span class="fc" id="L235">                u.setEmail(rs.getString(7));</span>
+<span class="fc" id="L236">                u.setResidenza(rs.getString(8));</span>
+<span class="fc" id="L237">                u.setPasswordHash(rs.getString(9));</span>
+<span class="fc" id="L238">                boolean us=(rs.getBoolean(10));</span>
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">                if(us)</span>
+<span class="fc" id="L240">                    u.setAmministratore(new RuoloAdmin());</span>
+                else
+<span class="nc" id="L242">                    u.setAmministratore(new RuoloStandard());</span>
+<span class="fc" id="L243">                u.setAccepted(rs.getBoolean(11));</span>
+<span class="fc" id="L244">            }</span>
+<span class="fc" id="L245">            return u;</span>
+<span class="nc" id="L246">        } catch (SQLException e) {</span>
+<span class="nc" id="L247">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /** Accetta un utente.
+     * @pre {@literal codiceFiscale!=null &amp;&amp; utente-&gt;exists(u|u.codiceFiscale==codiceFiscale)}
+     * @post {@literal utente-&gt;exists(u|u.codiceFiscale==codiceFiscale &amp;&amp; u.accepted==true)}
+     * @param codiceFiscale codice fiscale dell'utente da accettare.
+     */
+    public void doAccept(String codiceFiscale)
+    {
+<span class="fc" id="L258">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L260">            PreparedStatement ps = con.prepareStatement(&quot;UPDATE utente SET accepted=true WHERE codiceFiscale=?&quot;,</span>
+                    Statement.RETURN_GENERATED_KEYS);
+
+<span class="fc" id="L263">            ps.setString(1,codiceFiscale);</span>
+
+<span class="fc" id="L265">            ps.executeUpdate();</span>
+
+<span class="nc" id="L267">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L269">            throw new RuntimeException(e);</span>
+<span class="fc" id="L270">        }</span>
+<span class="fc" id="L271">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

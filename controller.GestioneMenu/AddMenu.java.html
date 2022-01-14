@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.GestioneMenu</a> &gt; <span class="el_source">AddMenu.java</span></div><h1>AddMenu.java</h1><pre class="source lang-java linenums">package controller.GestioneMenu;
+
+import model.mensa.Mensa;
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.utente.RuoloUtente;
+import model.utente.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+/**
+ * Classe che aggiunge menu al Sistema da parte dell'admin
+ */
+@WebServlet(name = &quot;AddMenu&quot;, value = &quot;/AddMenu&quot;)
+@MultipartConfig
+public class AddMenu extends HttpServlet {
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+
+    /**
+     * Costruttore Vuoto
+     */
+    public AddMenu() {
+<span class="nc" id="L40">        super();</span>
+<span class="nc" id="L41">        menudao = new MenuDAO();</span>
+<span class="nc" id="L42">    }</span>
+
+    /**
+     * Costruttore con parametri
+     *
+     * @param menudao DAO di Menu
+     */
+    public AddMenu(MenuDAOInterface menudao) {
+<span class="fc" id="L50">        super();</span>
+<span class="fc" id="L51">        this.menudao = menudao;</span>
+<span class="fc" id="L52">    }</span>
+
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L56">        doGet(request, response);</span>
+<span class="nc" id="L57">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L60">        request.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L61">        HttpSession session = request.getSession();</span>
+<span class="fc" id="L62">        Utente u = (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="fc" id="L63">        Menu menu = new Menu();</span>
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (u == null)</span>
+<span class="fc" id="L66">            response.sendRedirect(request.getContextPath() + &quot;/index.jsp&quot;);</span>
+        else {
+<span class="fc" id="L68">            RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (!ruoloUtente.isAdmin())</span>
+<span class="fc" id="L70">                response.sendRedirect(request.getContextPath() + &quot;/toHome&quot;);</span>
+            else {
+<span class="fc" id="L72">                Part image = request.getPart(&quot;image&quot;);</span>
+<span class="fc" id="L73">                String nameImage = System.currentTimeMillis() + Paths.get(image.getSubmittedFileName()).getFileName().toString();</span>
+<span class="fc" id="L74">                String uploadPath = System.getenv(&quot;CATALINA_HOME&quot;) + File.separator + &quot;uploads&quot; + File.separator;</span>
+<span class="fc" id="L75">                InputStream stream = image.getInputStream();</span>
+<span class="fc" id="L76">                String linkImmagine = uploadPath + nameImage;</span>
+<span class="fc" id="L77">                File file = new File(linkImmagine);</span>
+                try {
+<span class="fc" id="L79">                    Files.copy(stream, file.toPath());</span>
+<span class="nc" id="L80">                } catch (FileAlreadyExistsException e) {</span>
+                    /* do nothing */
+<span class="fc" id="L82">                }</span>
+
+<span class="fc" id="L84">                String nome = request.getParameter(&quot;nome&quot;);</span>
+<span class="fc" id="L85">                String primo = request.getParameter(&quot;primo&quot;);</span>
+<span class="fc" id="L86">                String secondo = request.getParameter(&quot;secondo&quot;);</span>
+<span class="fc" id="L87">                String dessert = request.getParameter(&quot;dessert&quot;);</span>
+<span class="fc" id="L88">                String descrizione = request.getParameter(&quot;descrizione&quot;);</span>
+<span class="fc" id="L89">                float prezzo = Float.parseFloat(request.getParameter(&quot;prezzo&quot;));</span>
+<span class="fc" id="L90">                menu.setNome(nome);</span>
+<span class="fc" id="L91">                menu.setPrimo(primo);</span>
+<span class="fc" id="L92">                menu.setSecondo(secondo);</span>
+<span class="fc" id="L93">                menu.setDessert(dessert);</span>
+<span class="fc" id="L94">                menu.setDescrizione(descrizione);</span>
+<span class="fc" id="L95">                menu.setImmagine(nameImage);</span>
+<span class="fc" id="L96">                menu.setPrezzo(prezzo);</span>
+<span class="fc" id="L97">                menu.setAvailable(true);</span>
+<span class="fc" id="L98">                boolean result = this.addMenu(menu);</span>
+                String message;
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                if (result)</span>
+<span class="fc" id="L101">                    message = &quot;Il menu è stato aggiunto correttamente&quot;;</span>
+                else
+<span class="fc" id="L103">                    message = &quot;Il menu verrà aggiunto dopo l'orario di chiusura&quot;;</span>
+<span class="fc" id="L104">                request.setAttribute(&quot;message&quot;, message);</span>
+
+<span class="fc" id="L106">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMenuArea&quot;);</span>
+<span class="fc" id="L107">                dispatcher.forward(request, response);</span>
+            }
+        }
+<span class="fc" id="L110">    }</span>
+
+    /**
+     * Aggiunge un menu quando possibile
+     *
+     * @param menu menu da aggiungere
+     * @return true se il menu e' aggiunto all'istante, false se aggiunto successivamente
+     * @pre {@literal menu.nome!=null &amp;&amp; menu.primo!=null &amp;&amp; menu.secondo!=null &amp;&amp; menu.dessert!=null
+     * &amp;&amp; menu.descrizione!=null &amp;&amp; menu.immagine!=null &amp;&amp; menu.prezzo!=null &amp;&amp; menu.available!=null
+     * &amp;&amp; !(menu-&gt;includes(menu))}
+     * @post {@literal menu-&gt;includes(menu)}
+     */
+    public boolean addMenu(Menu menu) {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (Mensa.isMensaConfig()) {</span>
+<span class="fc" id="L124">            menudao.doSave(menu);</span>
+<span class="fc" id="L125">            return true;</span>
+        }
+<span class="fc" id="L127">        ArrayList&lt;Menu&gt; listAddMenu = Menu.getListAddMenu();</span>
+<span class="fc" id="L128">        listAddMenu.add(menu);</span>
+<span class="fc" id="L129">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

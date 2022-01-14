@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Utente.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.utente</a> &gt; <span class="el_source">Utente.java</span></div><h1>Utente.java</h1><pre class="source lang-java linenums">package model.utente;
+
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+
+/**
+ * La classe modella oggetti che rappresentano un utente.
+ */
+<span class="fc" id="L12">public class Utente {</span>
+
+    /**
+     * Il CF identifica un singolo utente.
+     */
+    private String CF;
+
+    /**
+     * nome dell'utente.
+     */
+    private String nome;
+
+    /**
+     * cognome dell'utente.
+     */
+    private String cognome;
+
+    /**
+     * sesso dell'utente.
+     */
+    private char sesso;
+
+    /**
+     * La data di nascita dell'utente
+     * @invariant CurrentDate - dataDiNascita {@literal &gt;}=0.
+     */
+    private Date dataDiNascita;
+
+    /**
+     * luogo di nascita dell'utente.
+     */
+    private String luogoDiNascita;
+
+    /**
+     * e-mail dell'utente.
+     */
+    private String email;
+
+    /**
+     * residenza dell'utente.
+     */
+    private String residenza;
+
+    /**
+     * password dell'utente.
+     */
+    private String password;
+
+    /**
+     * Se l'utente e' amministratore.
+     */
+    private RuoloUtente amministratore;
+
+    /**
+     * Se l'utente e' stato accettato sulla piattaforma.
+     */
+    private boolean accepted;
+
+
+    /** Restituisce il CF dell'utente.
+     * @return
+     * Restituisce il CF dell'utente.
+     */
+<span class="fc" id="L75">    public String getCF() {return CF;}</span>
+
+
+    /**
+     * Imposta il CF dell'utente.
+     * @param CF CF dell'utente.
+     */
+<span class="fc" id="L82">    public void setCF(String CF) {this.CF = CF;}</span>
+
+
+    /** Restituisce il nome dell'utente.
+     * @return
+     * Restituisce il nome dell'utente.
+     */
+<span class="fc" id="L89">    public String getNome() {return nome;}</span>
+
+
+    /**
+     * Imposta il nome dell'utente.
+     * @param nome nome dell'utente.
+     */
+<span class="fc" id="L96">    public void setNome(String nome) {this.nome = nome;}</span>
+
+
+    /** Restituisce il cognome dell'utente.
+     * @return
+     * Restituisce il cognome dell'utente.
+     */
+<span class="fc" id="L103">    public String getCognome() {return cognome;}</span>
+
+
+    /**
+     * Imposta il cognome dell'utente.
+     * @param cognome cognome dell'utente.
+     */
+<span class="fc" id="L110">    public void setCognome(String cognome) {this.cognome = cognome;}</span>
+
+
+    /** Restituisce il sesso dell'utente.
+     * @return
+     * Restituisce il sesso dell'utente.
+     */
+<span class="fc" id="L117">    public char getSesso() {return sesso;}</span>
+
+
+    /**
+     * Imposta il sesso dell'utente.
+     * @param sesso sesso dell'utente.
+     */
+<span class="fc" id="L124">    public void setSesso(char sesso) {this.sesso = sesso;}</span>
+
+
+    /** Restituisce la data di nascita dell'utente.
+     * @return
+     * Restituisce la data di nascita dell'utente.
+     */
+<span class="fc" id="L131">    public Date getDataDiNascita() {return dataDiNascita;}</span>
+
+
+    /**
+     * Imposta la data di nascita dell'utente.
+     * @param dataDiNascita data di nascita dell'utente.
+     */
+<span class="fc" id="L138">    public void setDataDiNascita(Date dataDiNascita) {this.dataDiNascita = dataDiNascita;}</span>
+
+
+    /** Restituisce il luogo di nascita dell'utente.
+     * @return
+     * Restituisce il luogo di nascita dell'utente.
+     */
+<span class="fc" id="L145">    public String getLuogoDiNascita() {return luogoDiNascita;}</span>
+
+
+    /**
+     * Imposta il luogo di nascita dell'utente.
+     * @param luogoDiNascita luogo di nascita dell'utente.
+     */
+<span class="fc" id="L152">    public void setLuogoDiNascita(String luogoDiNascita) {this.luogoDiNascita = luogoDiNascita;}</span>
+
+
+    /** Restituisce l'e-mail dell'utente.
+     * @return
+     * Restituisce l'e-mail dell'utente.
+     */
+<span class="fc" id="L159">    public String getEmail() {return email;}</span>
+
+
+    /**
+     * Imposta la mail dell'utente.
+     * @param email e-mail dell'utente.
+     */
+<span class="fc" id="L166">    public void setEmail(String email) {this.email = email;}</span>
+
+
+    /** Restituisce il luogo di residenza dell'utente.
+     * @return
+     * Restituisce il luogo di residenza dell'utente.
+     */
+<span class="fc" id="L173">    public String getResidenza() {return residenza;}</span>
+
+
+    /**
+     * Imposta la residenza dell'utente.
+     * @param residenza residenza dell'utente.
+     */
+<span class="fc" id="L180">    public void setResidenza(String residenza) {this.residenza = residenza;}</span>
+
+
+    /** Restituisce la password criptata dell'utente.
+     * @return
+     * Restituisce la password criptata dell'utente.
+     */
+<span class="fc" id="L187">    public String getPassword() {return password;}</span>
+
+    /**
+     * Imposta la password dell'utente in maniera criptata.
+     * @param password password criptata dell'utente.
+     */
+    public void setPasswordHash(String password)
+    {
+        try
+        {
+<span class="fc" id="L197">            MessageDigest digest = MessageDigest.getInstance(&quot;SHA-1&quot;);</span>
+<span class="fc" id="L198">            digest.reset();</span>
+<span class="fc" id="L199">            digest.update(password.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L200">            this.password = String.format(&quot;%040x&quot;, new BigInteger(1, digest.digest()));</span>
+        }
+<span class="nc" id="L202">        catch (NoSuchAlgorithmException e)</span>
+        {
+<span class="nc" id="L204">            throw new RuntimeException(e);</span>
+<span class="fc" id="L205">        }</span>
+<span class="fc" id="L206">    }</span>
+
+
+    /** Verifica se l'utente e' amministratore.
+     * @return
+     * Restituisce il valore che verifica se l'utente e' amministratore .
+     */
+<span class="fc" id="L213">    public RuoloUtente isAmministratore() {return amministratore;}</span>
+
+
+    /**
+     * Imposta il ruolo di amministratore dell'utente.
+     * @param amministratore stabilisce se l'utente e' amministratore.
+     */
+<span class="fc" id="L220">    public void setAmministratore(RuoloUtente amministratore) {this.amministratore = amministratore;}</span>
+
+
+    /** Verifica se l'utente e' stato accettato sulla piattaforma.
+     * @return
+     * Restituisce il valore che verifica se l'utente e' stato accettato sulla piattaforma.
+     */
+<span class="fc" id="L227">    public boolean isAccepted() {return accepted;}</span>
+
+
+    /**
+     * Imposta se l'utente e' stato accettato.
+     * @param accepted utente accettato.
+     */
+<span class="fc" id="L234">    public void setAccepted(boolean accepted) {this.accepted = accepted;}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

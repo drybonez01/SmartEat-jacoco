@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShowMenuDetails.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ShowMenuDetails.java</span></div><h1>ShowMenuDetails.java</h1><pre class="source lang-java linenums">package controller;
+
+import model.*;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.*;
+import java.io.IOException;
+
+/**
+ * Classe che implementa la visualizzazione di tutte le informazioni di un menu con vista da Admin.
+ */
+@WebServlet(name = &quot;ShowMenuDetails&quot;, value = &quot;/ShowMenuDetails&quot;)
+public class ShowMenuDetails extends HttpServlet {
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface mdao;
+
+
+    /**
+     * Costruttore Vuoto
+     */
+    public ShowMenuDetails() {
+<span class="nc" id="L26">        super();</span>
+<span class="nc" id="L27">        mdao=new MenuDAO();</span>
+<span class="nc" id="L28">    }</span>
+    /**Costruttore con parametri
+     * @param mdao DAO di Menu
+     */
+    public ShowMenuDetails(MenuDAOInterface mdao) {
+<span class="nc" id="L33">        super();</span>
+<span class="nc" id="L34">        this.mdao=mdao;</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+<span class="nc" id="L40">        HttpSession session=request.getSession();</span>
+<span class="nc" id="L41">        Utente u= (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if(u==null)</span>
+<span class="nc" id="L43">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else {
+<span class="nc" id="L45">            RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            if (!ruoloUtente.isAdmin())</span>
+<span class="nc" id="L47">                response.sendRedirect(request.getContextPath() + &quot;/toHome&quot;);</span>
+            else {
+<span class="nc" id="L49">                int codiceMenu = Integer.parseInt(request.getParameter(&quot;codiceMenu&quot;));</span>
+<span class="nc" id="L50">                Menu menu = this.getMenu(codiceMenu);</span>
+<span class="nc" id="L51">                request.setAttribute(&quot;menu&quot;, menu);</span>
+<span class="nc" id="L52">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/WEB-INF/results/admin/showMenuDetails.jsp&quot;);</span>
+<span class="nc" id="L53">                dispatcher.forward(request, response);</span>
+            }
+        }
+<span class="nc" id="L56">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L60">        doGet(request, response);</span>
+<span class="nc" id="L61">    }</span>
+
+    /** Restituisce un menu con chiave specificata
+     * @pre {@literal codiceMenu!=null}
+     * @post {@literal menu-&gt;select(m|m.codiceMenu==codiceMenu)}
+     * @param codiceMenu codice del menu da selezionare
+     * @return menu con codice specificato
+     */
+    public Menu getMenu(int codiceMenu)
+    {
+<span class="nc" id="L71">        return mdao.doRetrieveMenuByKey(codiceMenu);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

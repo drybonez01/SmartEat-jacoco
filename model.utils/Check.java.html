@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Check.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.utils</a> &gt; <span class="el_source">Check.java</span></div><h1>Check.java</h1><pre class="source lang-java linenums">package model.utils;
+
+import model.utente.Utente;
+import model.utente.UtenteDAO;
+
+import java.sql.Date;
+import java.util.ArrayList;
+
+/**
+ * Questa classe di servizio realizza la convalida degli input
+ */
+<span class="nc" id="L12">public class Check</span>
+{
+
+    public static Esito CFIsValid(String CF)
+    {
+<span class="fc" id="L17">        Esito result = new Esito();</span>
+<span class="fc" id="L18">        result.setValido(false);</span>
+<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (CF.length() &lt; 16) {</span>
+<span class="fc" id="L20">            result.setMessage(&quot;Lunghezza CF minore di 16 caratteri&quot;);</span>
+<span class="fc" id="L21">            return result;</span>
+        }
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (CF.length() &gt; 16) {</span>
+<span class="fc" id="L24">            result.setMessage(&quot;Lunghezza CF maggiore di 16 caratteri&quot;);</span>
+<span class="fc" id="L25">            return result;</span>
+        }
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        for (int i = 0; i &lt; 16; i++)</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">            if (!Character.isLetterOrDigit(CF.charAt(i))) {</span>
+<span class="fc" id="L29">                result.setMessage(&quot;Il CF può contenere solo lettere o numeri&quot;);</span>
+<span class="fc" id="L30">                return result;</span>
+            }
+        ArrayList&lt;Utente&gt; array;
+<span class="fc" id="L33">        UtenteDAO users = new UtenteDAO();</span>
+<span class="fc" id="L34">        array = (ArrayList&lt;Utente&gt;) users.doRetrieveAllUtente();</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        for (Utente x : array) {</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">            if (x.getCF().equals(CF)) {</span>
+<span class="fc" id="L37">                result.setMessage(&quot;Il CF è già presente in database&quot;);</span>
+<span class="fc" id="L38">                return result;</span>
+            }
+<span class="fc" id="L40">        }</span>
+<span class="fc" id="L41">        result.setValido(true);</span>
+<span class="fc" id="L42">        return result;</span>
+    }
+
+    public static Esito nomeIsValid(String name)
+    {
+<span class="fc" id="L47">        Esito result = new Esito();</span>
+<span class="fc" id="L48">        result.setValido(false);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (name.length() &gt; 20) {</span>
+<span class="fc" id="L50">            result.setMessage(&quot;Lunghezza nome maggiore di 20 caratteri&quot;);</span>
+<span class="fc" id="L51">            return result;</span>
+        }
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (name.length() == 0) {</span>
+<span class="fc" id="L54">            result.setMessage(&quot;Il campo nome non può essere vuoto&quot;);</span>
+<span class="fc" id="L55">            return result;</span>
+        }
+<span class="fc" id="L57">        result.setValido(true);</span>
+<span class="fc" id="L58">        return result;</span>
+    }
+
+    public static Esito cognomeIsValid(String surname)
+    {
+<span class="fc" id="L63">        Esito result = new Esito();</span>
+<span class="fc" id="L64">        result.setValido(false);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (surname.length() &gt; 20) {</span>
+<span class="fc" id="L66">            result.setMessage(&quot;Lunghezza cognome maggiore di 20 caratteri&quot;);</span>
+<span class="fc" id="L67">            return result;</span>
+        }
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (surname.length() == 0) {</span>
+<span class="fc" id="L70">            result.setMessage(&quot;Il campo cognome non può essere vuoto&quot;);</span>
+<span class="fc" id="L71">            return result;</span>
+        }
+<span class="fc" id="L73">        result.setValido(true);</span>
+<span class="fc" id="L74">        return result;</span>
+    }
+
+
+    public static Esito sessoIsValid(String str)
+    {
+<span class="fc" id="L80">        Esito result = new Esito();</span>
+<span class="fc" id="L81">        result.setValido(false);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if(str.isEmpty())</span>
+        {
+<span class="fc" id="L84">            result.setMessage(&quot;Formato non valido, inserire uno tra i seguenti caratteri: M, F, N&quot;);</span>
+<span class="fc" id="L85">            return result;</span>
+        }
+<span class="fc" id="L87">        char g=str.charAt(0);</span>
+<span class="pc bpc" id="L88" title="2 of 6 branches missed.">        if (!(Character.toString(g).equals(&quot;M&quot;)) &amp;&amp; !(Character.toString(g).equals(&quot;F&quot;)) &amp;&amp; !(Character.toString(g).equals(&quot;N&quot;))) {</span>
+<span class="fc" id="L89">            result.setMessage(&quot;Formato non valido, inserire uno tra i seguenti caratteri: M, F, N&quot;);</span>
+<span class="fc" id="L90">            return result;</span>
+        }
+<span class="fc" id="L92">        result.setValido(true);</span>
+<span class="fc" id="L93">        return result;</span>
+    }
+
+
+    public static Esito nascitaIsValid(Date data)
+    {
+<span class="fc" id="L99">        Esito result = new Esito();</span>
+<span class="fc" id="L100">        result.setValido(false);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (data.compareTo(new Date(System.currentTimeMillis())) &gt; 0) {</span>
+<span class="fc" id="L102">            result.setMessage(&quot;Data di nascita non valida&quot;);</span>
+<span class="fc" id="L103">            return result;</span>
+        }
+<span class="fc" id="L105">        int anno= Integer.parseInt((data.toString().substring(0,4)));</span>
+<span class="fc" id="L106">        String mese=(data.toString().substring(5,7));</span>
+<span class="fc" id="L107">        String giorno=(data.toString().substring(8,10));</span>
+<span class="pc bpc" id="L108" title="3 of 4 branches missed.">        if(mese.equals(&quot;02&quot;) &amp;&amp; giorno.compareTo(&quot;29&quot;)&gt;0)</span>
+        {
+<span class="nc" id="L110">            result.setMessage(&quot;Data di nascita non valida&quot;);</span>
+<span class="nc" id="L111">            return result;</span>
+        }
+<span class="pc bpc" id="L113" title="5 of 6 branches missed.">        if(mese.equals(&quot;02&quot;) &amp;&amp; anno%4!=0 &amp;&amp; giorno.compareTo(&quot;29&quot;)&gt;=0)</span>
+        {
+<span class="nc" id="L115">            result.setMessage(&quot;Data di nascita non valida&quot;);</span>
+<span class="nc" id="L116">            return result;</span>
+        }
+<span class="pc bpc" id="L118" title="4 of 10 branches missed.">        if(((mese.equals(&quot;04&quot;) || mese.equals(&quot;06&quot;) || mese.equals(&quot;09&quot;) || mese.equals(&quot;11&quot;)) &amp;&amp; giorno.compareTo(&quot;30&quot;)&gt;0))</span>
+        {
+<span class="nc" id="L120">            result.setMessage(&quot;Data di nascita non valida3&quot;);</span>
+<span class="nc" id="L121">            return result;</span>
+        }
+<span class="fc" id="L123">        result.setValido(true);</span>
+<span class="fc" id="L124">        return result;</span>
+    }
+
+
+    public static Esito luogoDNIsValid(String ldn)
+    {
+<span class="fc" id="L130">        Esito result = new Esito();</span>
+<span class="fc" id="L131">        result.setValido(false);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (ldn.length() &gt; 25) {</span>
+<span class="fc" id="L133">            result.setMessage(&quot;Lunghezza luogo di nascita maggiore di 25 caratteri&quot;);</span>
+<span class="fc" id="L134">            return result;</span>
+        }
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (ldn.length() == 0) {</span>
+<span class="fc" id="L137">            result.setMessage(&quot;Il campo luogo di nascita non può essere vuoto&quot;);</span>
+<span class="fc" id="L138">            return result;</span>
+        }
+<span class="fc" id="L140">        result.setValido(true);</span>
+<span class="fc" id="L141">        return result;</span>
+    }
+
+
+    public static Esito mailIsValidReg(String mail)
+    {
+<span class="fc" id="L147">        Esito result = new Esito();</span>
+<span class="fc" id="L148">        result.setValido(false);</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (mail.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L150">            result.setMessage(&quot;Il campo mail non può essere vuoto&quot;);</span>
+<span class="fc" id="L151">            return result;</span>
+        }
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (!(mail.contains(&quot;@&quot;))) {</span>
+<span class="fc" id="L154">            result.setMessage(&quot;Il campo mail deve contenere @&quot;);</span>
+<span class="fc" id="L155">            return result;</span>
+        }
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (!(mail.contains(&quot;.&quot;))) {</span>
+<span class="fc" id="L158">            result.setMessage(&quot;Il campo mail non rispetta il formato&quot;);</span>
+<span class="fc" id="L159">            return result;</span>
+        }
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (mail.length() &lt; 6) {</span>
+<span class="fc" id="L162">            result.setMessage(&quot;Il campo mail non contiene abbastanza caratteri&quot;);</span>
+<span class="fc" id="L163">            return result;</span>
+        }
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (mail.length() &gt; 35) {</span>
+<span class="fc" id="L166">            result.setMessage(&quot;Il campo mail contiene più di 35 caratteri&quot;);</span>
+<span class="fc" id="L167">            return result;</span>
+        }
+        ArrayList&lt;Utente&gt; array;
+<span class="fc" id="L170">        UtenteDAO users = new UtenteDAO();</span>
+<span class="fc" id="L171">        array = (ArrayList&lt;Utente&gt;) users.doRetrieveAllUtente();</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        for (Utente x : array) {</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (x.getEmail().equals(mail)) {</span>
+<span class="fc" id="L174">                result.setMessage(&quot;Il campo mail è già presente nel database&quot;);</span>
+<span class="fc" id="L175">                return result;</span>
+            }
+<span class="fc" id="L177">        }</span>
+<span class="fc" id="L178">        result.setValido(true);</span>
+<span class="fc" id="L179">        return result;</span>
+    }
+
+    public static Esito mailIsValidLogin(String mail)
+    {
+<span class="fc" id="L184">        Esito result = new Esito();</span>
+<span class="fc" id="L185">        result.setValido(false);</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">        if (mail.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L187">            result.setMessage(&quot;Il campo mail non può essere vuoto&quot;);</span>
+<span class="fc" id="L188">            return result;</span>
+        }
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        if (!(mail.contains(&quot;@&quot;))) {</span>
+<span class="fc" id="L191">            result.setMessage(&quot;Il campo mail deve contenere @&quot;);</span>
+<span class="fc" id="L192">            return result;</span>
+        }
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        if (!(mail.contains(&quot;.&quot;))) {</span>
+<span class="fc" id="L195">            result.setMessage(&quot;Il campo mail non rispetta il formato&quot;);</span>
+<span class="fc" id="L196">            return result;</span>
+        }
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (mail.length() &lt; 6) {</span>
+<span class="fc" id="L199">            result.setMessage(&quot;Il campo mail non contiene abbastanza caratteri&quot;);</span>
+<span class="fc" id="L200">            return result;</span>
+        }
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (mail.length() &gt; 35) {</span>
+<span class="fc" id="L203">            result.setMessage(&quot;Il campo mail contiene più di 35 caratteri&quot;);</span>
+<span class="fc" id="L204">            return result;</span>
+        }
+<span class="fc" id="L206">        result.setValido(true);</span>
+<span class="fc" id="L207">        return result;</span>
+    }
+
+
+    public static Esito residenzaIsValid(String res)
+    {
+<span class="fc" id="L213">        Esito result = new Esito();</span>
+<span class="fc" id="L214">        result.setValido(false);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (res.length() &gt; 35)</span>
+        {
+<span class="fc" id="L217">            result.setMessage(&quot;Il campo residenza contiene più di 35 caratteri&quot;);</span>
+<span class="fc" id="L218">            return result;</span>
+        }
+<span class="fc bfc" id="L220" title="All 2 branches covered.">        if (res.length() == 0)</span>
+        {
+<span class="fc" id="L222">            result.setMessage(&quot;Il campo mail non può essere vuoto&quot;);</span>
+<span class="fc" id="L223">            return result;</span>
+        }
+<span class="fc" id="L225">        result.setValido(true);</span>
+<span class="fc" id="L226">        return result;</span>
+    }
+
+
+    public static Esito passwordIsValid(String password, String passwordCheck) {
+<span class="fc" id="L231">        Esito result = new Esito();</span>
+<span class="fc" id="L232">        result.setValido(false);</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">        if (!password.equals(passwordCheck)) {</span>
+<span class="fc" id="L234">            result.setMessage(&quot;Le due password non coincidono&quot;);</span>
+<span class="fc" id="L235">            return result;</span>
+        }
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        if (password.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L238">            result.setMessage(&quot;Il campo password è vuoto&quot;);</span>
+<span class="fc" id="L239">            return result;</span>
+        }
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if (password.length() &lt; 8) {</span>
+<span class="fc" id="L242">            result.setMessage(&quot;Il campo password ha meno di 8 caratteri&quot;);</span>
+<span class="fc" id="L243">            return result;</span>
+        }
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        if (password.length() &gt; 16) {</span>
+<span class="fc" id="L246">            result.setMessage(&quot;Il campo password ha più di 16 caratteri&quot;);</span>
+<span class="fc" id="L247">            return result;</span>
+        }
+<span class="fc bfc" id="L249" title="All 2 branches covered.">        if (password.equals(password.toLowerCase())) {</span>
+<span class="fc" id="L250">            result.setMessage(&quot;Il campo password non ha caratteri maiuscoli&quot;);</span>
+<span class="fc" id="L251">            return result;</span>
+        }
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        if (password.equals(password.toUpperCase())) {</span>
+<span class="fc" id="L254">            result.setMessage(&quot;Il campo password non ha caratteri minuscoli&quot;);</span>
+<span class="fc" id="L255">            return result;</span>
+        }
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        if (!password.matches(&quot;(.*[0-9].*)&quot;)) {</span>
+<span class="fc" id="L258">            result.setMessage(&quot;Il campo password non ha numeri&quot;);</span>
+<span class="fc" id="L259">            return result;</span>
+        }
+<span class="fc" id="L261">        boolean checkSpecial = false;</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">        for (int i = 0; i &lt; password.length(); i++)</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">            if (!Character.isLetterOrDigit(password.charAt(i)))</span>
+<span class="fc" id="L264">                checkSpecial = true;</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">        if (!checkSpecial) {</span>
+<span class="fc" id="L266">            result.setMessage(&quot;Il campo password non ha caratteri speciali&quot;);</span>
+<span class="fc" id="L267">            return result;</span>
+        }
+<span class="fc" id="L269">        result.setValido(true);</span>
+<span class="fc" id="L270">        return result;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

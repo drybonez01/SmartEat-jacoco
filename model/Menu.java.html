@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Menu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Menu.java</span></div><h1>Menu.java</h1><pre class="source lang-java linenums">package model;
+
+
+import java.util.ArrayList;
+
+/**
+ * La classe modella i menu.
+ */
+<span class="fc" id="L9">public class Menu</span>
+{
+    /**
+     * Il codice menu identifica un singolo menu.
+     */
+    private int codiceMenu;
+
+    /**
+     * Nome del menu.
+     */
+    private String nome;
+
+
+    /**
+     *Prima portata del menu.
+     */
+    private String primo;
+
+    /**
+     *Seconda portata del menu.
+     */
+    private String secondo;
+
+    /**
+     *Dessert del menu.
+     */
+    private String dessert;
+
+    /**
+     *Descrizione del menu.
+     */
+    private String descrizione;
+
+    /**
+     *Immagine del menu.
+     */
+    private String immagine;
+
+    /**
+     *Prezzo del menu.
+     */
+    private float prezzo;
+
+    /**
+     *Indica se il menu e' disponibile.
+     */
+    private boolean available;
+
+    /**
+     * ArrayList di servizio per aggiungere menu.
+     */
+<span class="fc" id="L60">    private static ArrayList&lt;Menu&gt; listAddMenu=new ArrayList&lt;&gt;();</span>
+
+    /**
+     * ArrayList di servizio per modificare la disponibilita' di un menu.
+     */
+<span class="fc" id="L65">    private static ArrayList&lt;Integer&gt; listToggleMenu=new ArrayList&lt;&gt;();</span>
+
+
+    /**
+     * ArrayList di servizio per eliminare un menu.
+     */
+<span class="fc" id="L71">    private static ArrayList&lt;Integer&gt; listDeleteMenu=new ArrayList&lt;&gt;();</span>
+
+
+    /** Restituisce il codice del menu.
+     * @return
+     * Restituisce il codice del menu.
+     */
+<span class="fc" id="L78">    public int getCodiceMenu() {return codiceMenu;}</span>
+
+
+    /**
+     * Imposta il codice del menu.
+     * @param codiceMenu Codice del menu
+     */
+<span class="fc" id="L85">    public void setCodiceMenu(int codiceMenu) {this.codiceMenu = codiceMenu;}</span>
+
+
+
+    /** Restituisce il nome del menu.
+     * @return
+     * Restituisce il nome del menu.
+     */
+<span class="fc" id="L93">    public String getNome() {return nome;}</span>
+
+
+    /**
+     * Imposta il nome del menu.
+     * @param nome nome del menu.
+     */
+<span class="fc" id="L100">    public void setNome(String nome) {this.nome = nome;}</span>
+
+
+
+    /** Restituisce il nome del primo piatto del menu.
+     * @return
+     * Restituisce il nome del primo piatto del menu.
+     */
+<span class="fc" id="L108">    public String getPrimo() {return primo;}</span>
+
+
+    /**
+     * Imposta il nome del primo piatto del menu.
+     * @param primo nome primo piatto del menu.
+     */
+<span class="fc" id="L115">    public void setPrimo(String primo) {this.primo = primo;}</span>
+
+
+    /** Restituisce il nome del secondo piatto del menu.
+     * @return
+     * Restituisce il nome del secondo piatto del menu.
+     */
+<span class="fc" id="L122">    public String getSecondo() {return secondo;}</span>
+
+
+    /**
+     * Imposta il nome del secondo piatto del menu.
+     * @param secondo nome secondo piatto del menu.
+     */
+<span class="fc" id="L129">    public void setSecondo(String secondo) {this.secondo = secondo;}</span>
+
+
+    /** Restituisce il nome del dessert del menu.
+     * @return
+     * Restituisce il nome del dessert del menu.
+     */
+<span class="fc" id="L136">    public String getDessert() {return dessert;}</span>
+
+
+    /**
+     * Imposta il nome del dessert del menu.
+     * @param dessert nome dessert del menu.
+     */
+<span class="fc" id="L143">    public void setDessert(String dessert) {this.dessert = dessert;}</span>
+
+
+    /** Restituisce la descrizione del menu.
+     * @return
+     * Restituisce la descrizione del menu.
+     */
+<span class="fc" id="L150">    public String getDescrizione() {return descrizione;}</span>
+
+
+    /**
+     * Imposta la descrizione del menu.
+     * @param descrizione descrizione del menu.
+     */
+<span class="fc" id="L157">    public void setDescrizione(String descrizione) {this.descrizione = descrizione;}</span>
+
+
+    /** Restituisce l'immagine del menu.
+     * @return
+     * Restituisce l'immagine del menu.
+     */
+<span class="fc" id="L164">    public String getImmagine() {return immagine;}</span>
+
+
+    /**
+     * Imposta l'immagine del menu.
+     * @param immagine immagine del menu.
+     */
+<span class="fc" id="L171">    public void setImmagine(String immagine) {this.immagine = immagine;}</span>
+
+
+    /** Restituisce il prezzo del menu.
+     * @return
+     * Restituisce il prezzo del menu.
+     */
+<span class="fc" id="L178">    public float getPrezzo() {return prezzo;}</span>
+
+
+    /**
+     * Imposta il prezzo del menu.
+     * @param prezzo prezzo del menu.
+     */
+<span class="fc" id="L185">    public void setPrezzo(float prezzo) {this.prezzo = prezzo;}</span>
+
+
+    /** Verifica se il menu e' disponibile.
+     * @return
+     * Restituisce il valore che verifica se il menu è disponibile.
+     */
+<span class="fc" id="L192">    public boolean isAvailable() {return available;}</span>
+
+
+    /**
+     * Imposta se il menu e' disponibile.
+     * @param available disponibilita del menu.
+     */
+<span class="fc" id="L199">    public void setAvailable(boolean available) {this.available = available;}</span>
+
+    /**
+     * Restituisce i menu da aggiungere
+     * @return Lista di menu da aggiungere
+     */
+<span class="fc" id="L205">    public static ArrayList&lt;Menu&gt; getListAddMenu() {return listAddMenu;}</span>
+
+
+    /**
+     * Restituisce i codici dei menu a cui cambiare la disponibilita'
+     * @return Lista di codici di menu
+     */
+<span class="nc" id="L212">    public static ArrayList&lt;Integer&gt; getListToggleMenu() {return listToggleMenu;}</span>
+
+
+
+    /**
+     *  Restituisce i codici dei menu da eliminare
+     * @return Lista di codici di menu
+     */
+<span class="nc" id="L220">    public static ArrayList&lt;Integer&gt; getListDeleteMenu() {return listDeleteMenu;}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

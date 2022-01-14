@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuyMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.ProcessoDiAcquisto</a> &gt; <span class="el_source">BuyMenu.java</span></div><h1>BuyMenu.java</h1><pre class="source lang-java linenums">package controller.ProcessoDiAcquisto;
+
+import model.acquisto.AcquistoDAO;
+import model.acquisto.Acquisto;
+import model.acquisto.AcquistoDAOInterface;
+import model.mensa.Mensa;
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.pietanza.Pietanza;
+import model.pietanza.PietanzaDAO;
+import model.pietanza.PietanzaDAOInterface;
+import model.tessera.Tessera;
+import model.tessera.TesseraDAO;
+import model.tessera.TesseraDAOInterface;
+import model.utente.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.List;
+
+/**
+ * Classe che implementa l'acquisto di un menu
+ */
+@WebServlet(name=&quot;BuyMenu&quot;, value=&quot;/BuyMenu&quot;)
+public class BuyMenu extends HttpServlet
+{
+    /**
+     * DAO di Tessera
+     */
+    private final TesseraDAOInterface tdao;
+
+    /**
+     * DAO di Acquisto
+     */
+    private final AcquistoDAOInterface acquistodao;
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+    /**
+     * DAO di Pietanza
+     */
+    private final PietanzaDAOInterface pdao;
+
+
+    /**
+     *    Costruttore vuoto
+     */
+    public BuyMenu() {
+<span class="nc" id="L60">        super();</span>
+<span class="nc" id="L61">        tdao = new TesseraDAO();</span>
+<span class="nc" id="L62">        acquistodao=new AcquistoDAO();</span>
+<span class="nc" id="L63">        menudao=new MenuDAO();</span>
+<span class="nc" id="L64">        pdao=new PietanzaDAO();</span>
+<span class="nc" id="L65">    }</span>
+
+    /**Costruttore con parametri
+     * @param tdao DAO di Tessera
+     * @param acquistodao DAO di Acquisto
+     * @param menudao DAO di Menu
+     * @param pdao DAO di Pietanza
+     */
+    public BuyMenu(TesseraDAOInterface tdao,AcquistoDAOInterface acquistodao,MenuDAOInterface menudao,PietanzaDAOInterface pdao) {
+<span class="fc" id="L74">        super();</span>
+<span class="fc" id="L75">        this.tdao = tdao;</span>
+<span class="fc" id="L76">        this.acquistodao=acquistodao;</span>
+<span class="fc" id="L77">        this.menudao=menudao;</span>
+<span class="fc" id="L78">        this.pdao=pdao;</span>
+<span class="fc" id="L79">    }</span>
+
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="nc" id="L83">        doGet(request, response);</span>
+<span class="nc" id="L84">    }</span>
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+
+<span class="fc" id="L89">        int codiceMenu = Integer.parseInt(request.getParameter(&quot;codiceMenu&quot;));</span>
+<span class="fc" id="L90">        HttpSession session=request.getSession();</span>
+<span class="fc" id="L91">        Utente user= (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+
+<span class="fc" id="L93">        Date actual=new Date(System.currentTimeMillis());</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        boolean posto = request.getParameter(&quot;postoMensa&quot;) != null;</span>
+<span class="fc" id="L95">        Tessera tessera=tdao.doRetrieveTesseraByKey(user.getCF());</span>
+<span class="fc" id="L96">        String[] message=new String[2];</span>
+<span class="fc" id="L97">        boolean buy=this.buy(codiceMenu,actual,posto,user.getCF(),tessera,message);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if(!buy)</span>
+<span class="fc" id="L99">            request.setAttribute(&quot;message&quot;,message[0]);</span>
+        else
+<span class="fc" id="L101">            request.setAttribute(&quot;message&quot;,message[1]);</span>
+<span class="fc" id="L102">        RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/WEB-INF/results/mensa/home.jsp&quot;);</span>
+<span class="fc" id="L103">        dispatcher.forward(request, response);</span>
+
+<span class="fc" id="L105">    }</span>
+
+    /** La classe effettua l'acquisto di un menu, se possibile.
+     *
+     * @pre {@literal codiceMenu!=null &amp;&amp; actual!=null &amp;&amp; posto!=null &amp;&amp; CF!=null &amp;&amp; tessera.codiceFiscale!=null &amp;&amp; tessera.saldo!=null
+     * &amp;&amp; tessera-&gt;exists(t|t.codiceFiscale==tessera.codiceFiscale)}
+     * @param codiceMenu codice del menu acquistato.
+     * @param actual data del giorno.
+     * @param posto stabilisce se si è prenotato un posto in mensa.
+     * @param CF codice fiscale dell'utente.
+     * @param tessera tessera dell'utente.
+     * @param message array di stringhe con messaggi di successo o errore.
+     * @return true se l'acquisto è andato a buon fine, false altrimenti.
+     */
+    public boolean buy(int codiceMenu,Date actual, boolean posto, String CF,Tessera tessera,String[] message)
+    {
+
+<span class="fc" id="L122">        Acquisto acquisto=new Acquisto();</span>
+<span class="fc" id="L123">        acquisto.setDataAcquisto(actual);</span>
+<span class="fc" id="L124">        acquisto.setCF(CF);</span>
+<span class="fc" id="L125">        acquisto.setCodiceMenu(codiceMenu);</span>
+<span class="fc" id="L126">        acquisto.setPostoMensa(posto);</span>
+<span class="fc" id="L127">        Menu menu=menudao.doRetrieveMenuByKey(codiceMenu);</span>
+<span class="fc" id="L128">        float prezzo=menu.getPrezzo();</span>
+<span class="fc" id="L129">        boolean hasPurchase=false;</span>
+<span class="fc" id="L130">        List&lt;Acquisto&gt; acquistos =acquistodao.doRetrieveAllAcquistoByCF(CF);</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (Acquisto value : acquistos) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if (value.getDataAcquisto().toString().equals(actual.toString())) {</span>
+<span class="fc" id="L133">                hasPurchase = true;</span>
+<span class="fc" id="L134">                break;</span>
+            }
+<span class="fc" id="L136">        }</span>
+
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if(Mensa.isMensaPurchase())</span>
+        {
+<span class="fc bfc" id="L140" title="All 2 branches covered.">            if(tessera.getSaldo()-prezzo&gt;=0)</span>
+            {
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                if(!hasPurchase)</span>
+                {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                    if(posto)</span>
+                    {
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                        if(Mensa.getPostiVuoti()==0)</span>
+                        {
+<span class="fc" id="L148">                            message[0]=&quot;Posto non disponibile, l'operazione non ha avuto successo&quot;;</span>
+<span class="fc" id="L149">                            return false;</span>
+                        }
+<span class="fc" id="L151">                        Mensa.setPostiVuoti(Mensa.getPostiVuoti()-1);</span>
+                    }
+<span class="fc" id="L153">                    acquistodao.doSave(acquisto);</span>
+<span class="fc" id="L154">                    tessera.setSaldo(tessera.getSaldo()-prezzo);</span>
+<span class="fc" id="L155">                    tdao.doUpdate(tessera);</span>
+<span class="fc" id="L156">                    Pietanza primo= pdao.doRetrievePietanzaByKey(menu.getPrimo());</span>
+<span class="fc" id="L157">                    Pietanza secondo= pdao.doRetrievePietanzaByKey(menu.getSecondo());</span>
+<span class="fc" id="L158">                    Pietanza dessert= pdao.doRetrievePietanzaByKey(menu.getDessert());</span>
+<span class="fc" id="L159">                    primo.setNumeroAcquisti(primo.getNumeroAcquisti()+1);</span>
+<span class="fc" id="L160">                    secondo.setNumeroAcquisti(primo.getNumeroAcquisti()+1);</span>
+<span class="fc" id="L161">                    dessert.setNumeroAcquisti(primo.getNumeroAcquisti()+1);</span>
+<span class="fc" id="L162">                    pdao.doUpdate(primo);</span>
+<span class="fc" id="L163">                    pdao.doUpdate(secondo);</span>
+<span class="fc" id="L164">                    pdao.doUpdate(dessert);</span>
+<span class="fc" id="L165">                }</span>
+                else
+                {
+<span class="fc" id="L168">                    message[0]=&quot;Limite acquisto giornaliero raggiunto, l'operazione non ha avuto successo.&quot;;</span>
+<span class="fc" id="L169">                    return false;</span>
+                }
+            }
+            else
+            {
+<span class="fc" id="L174">                message[0]=&quot;Saldo insufficiente, l'operazione non ha avuto successo.&quot;;</span>
+<span class="fc" id="L175">                return false;</span>
+            }
+        }
+        else
+        {
+<span class="fc" id="L180">            message[0]=&quot;Il periodo per effettuare acquisti è terminato, ritorni nella fascia d'orario consentita.&quot;;</span>
+<span class="fc" id="L181">            return false;</span>
+        }
+<span class="fc" id="L183">        message[1]=&quot;Operazione di acquisto completata con successo.&quot;;</span>
+<span class="fc" id="L184">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

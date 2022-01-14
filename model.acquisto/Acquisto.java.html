@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Acquisto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.acquisto</a> &gt; <span class="el_source">Acquisto.java</span></div><h1>Acquisto.java</h1><pre class="source lang-java linenums">package model.acquisto;
+
+import java.sql.Date;
+
+/**
+ * La classe modella oggetti che rappresentano un acquisto di un menu.
+ */
+<span class="fc" id="L8">public class Acquisto</span>
+{
+    /** La data di acquisto deve essere inferiore o uguale a quella attuale.
+     *  @invariant  CurrentDate - dataAcquisto {@literal &gt;}=0.
+     */
+    private Date dataAcquisto;
+
+    /**
+     * Il codice fiscale identifica un singolo cliente.
+     */
+    private String CF;
+
+    /**
+     * codiceMenu indica univocamente un singolo menu.
+     */
+    private int codiceMenu;
+
+    /**
+     * postoMensa indica se un acquisto comprende o meno la prenotazione di un posto in mensa.
+     */
+    private boolean postoMensa;
+
+    /**
+     * refund indica se un acquisto può essere cancellato per ottenere un riborso.
+     */
+    private boolean refund;
+
+    /** Restituisce la data di acquisto.
+     * @return
+     * Restituisce la data di acquisto.
+     */
+<span class="fc" id="L39">    public Date getDataAcquisto() { return dataAcquisto;}</span>
+
+    /**
+     * Imposta la data di acquisto.
+     * @param dataAcquisto data di acquisto
+     */
+<span class="fc" id="L45">    public void setDataAcquisto(Date dataAcquisto) {this.dataAcquisto = dataAcquisto;}</span>
+
+    /**Restituisce il codice fiscale.
+     * @return
+     * Restituisce il codice fiscale.
+     */
+<span class="fc" id="L51">    public String getCF() {return CF;}</span>
+
+    /**
+     * Imposta il codice fiscale.
+     * @param CF codice fiscale
+     */
+<span class="fc" id="L57">    public void setCF(String CF) {this.CF = CF;}</span>
+
+    /**Restituisce il codice del menu.
+     *@return
+     * Restituisce il codice del menu.
+     */
+<span class="fc" id="L63">    public int getCodiceMenu() {return codiceMenu;}</span>
+
+    /**
+     * Imposta il codice del menu.
+     * @param codiceMenu codice univoco del menu
+     */
+    public void setCodiceMenu(int codiceMenu) {
+<span class="fc" id="L70">        this.codiceMenu = codiceMenu;}</span>
+
+    /**Verifica se si e' prenotato il posto in mensa.
+     * @return
+     * Verifica se si e' prenotato il posto in mensa.
+     */
+<span class="fc" id="L76">    public boolean isPostoMensa() {return postoMensa;}</span>
+
+    /**
+     * Imposta la prenotazione di un posto in mensa.
+     * @param postoMensa Posto prenotato in mensa o meno
+     */
+<span class="fc" id="L82">    public void setPostoMensa(boolean postoMensa) {this.postoMensa = postoMensa;}</span>
+
+
+    /**Verifica se il rimborso è disponibile per questo acquisto.
+     * @return
+     *Verifica se il rimborso è disponibile per questo acquisto.
+     */
+<span class="nc" id="L89">    public boolean isRefund() {return refund;}</span>
+
+    /**
+     * Imposta la possibilità di rimborso.
+     * @param refund Rimborso possibile o meno
+     */
+<span class="nc" id="L95">    public void setRefund(boolean refund) {this.refund = refund;}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

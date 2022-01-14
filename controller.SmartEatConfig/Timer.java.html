@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Timer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller.SmartEatConfig</a> &gt; <span class="el_source">Timer.java</span></div><h1>Timer.java</h1><pre class="source lang-java linenums">package controller.SmartEatConfig;
+
+import model.mensa.Mensa;
+import model.mensa.MensaDAO;
+import model.mensa.MensaDAOInterface;
+import model.menu.Menu;
+import model.menu.MenuDAO;
+import model.menu.MenuDAOInterface;
+import model.pietanza.Pietanza;
+import model.pietanza.PietanzaDAO;
+import model.pietanza.PietanzaDAOInterface;
+
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.TimerTask;
+
+/**
+ * Questa classe estende TimerTask. Come tale contiene solo un metodo run()
+ */
+public class Timer extends TimerTask {
+
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+    /**
+     * DAO di Mensa
+     */
+    private final MensaDAOInterface dao;
+    /**
+     * DAO di Pietanza
+     */
+    private final PietanzaDAOInterface pietanzaDao;
+
+    /**
+     * Costruttore Vuoto
+     */
+    public Timer() {
+<span class="nc" id="L39">        super();</span>
+<span class="nc" id="L40">        menudao = new MenuDAO();</span>
+<span class="nc" id="L41">        dao=new MensaDAO();</span>
+<span class="nc" id="L42">        pietanzaDao=new PietanzaDAO();</span>
+<span class="nc" id="L43">    }</span>
+
+    /**Costruttore con parametri
+     * @param dao DAO di Mensa
+     * @param menudao DAO di Menu
+     * @param pietanzaDao DAO di Pietanza
+     */
+    public Timer(MensaDAOInterface dao,MenuDAOInterface menudao,PietanzaDAOInterface pietanzaDao) {
+<span class="nc" id="L51">        super();</span>
+<span class="nc" id="L52">        this.dao = dao;</span>
+<span class="nc" id="L53">        this.pietanzaDao=pietanzaDao;</span>
+<span class="nc" id="L54">        this.menudao=menudao;</span>
+<span class="nc" id="L55">    }</span>
+
+    /**
+     * Metodo che resetta la variabile postiVuoti in mensa su quella postiDisponibili in database ed esegue
+     * varie operazioni di aggiornamento per menu e pietanze.
+     */
+    public void run(){
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if(Mensa.isMensaConfig())</span>
+        {
+<span class="nc" id="L65">            ArrayList&lt;Menu&gt; listAddMenu=Menu.getListAddMenu();</span>
+<span class="nc" id="L66">            ArrayList&lt;Integer&gt; listToggleMenu=Menu.getListToggleMenu();</span>
+<span class="nc" id="L67">            ArrayList&lt;Integer&gt; listDeleteMenu=Menu.getListDeleteMenu();</span>
+<span class="nc" id="L68">            ArrayList&lt;String&gt; listDeletePietanza= Pietanza.getListDeletePietanza();</span>
+<span class="nc" id="L69">            ArrayList&lt;String&gt; listUpdateMensa=Mensa.getListUpdateMensa();</span>
+<span class="nc" id="L70">            Mensa.setPostiVuoti(Mensa.mensa.getPostiDisponibili());</span>
+<span class="nc" id="L71">            System.out.println(&quot;Aggiornamento posti&quot;);</span>
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            while(!listAddMenu.isEmpty())</span>
+            {
+<span class="nc" id="L75">                menudao.doSave(listAddMenu.get(0));</span>
+<span class="nc" id="L76">                listAddMenu.remove(0);</span>
+<span class="nc" id="L77">                System.out.println(&quot;aggiunto un menu&quot;);</span>
+            }
+
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            while(!listToggleMenu.isEmpty())</span>
+            {
+<span class="nc" id="L82">                int codiceMenu=listToggleMenu.get(0);</span>
+<span class="nc" id="L83">                boolean available=menudao.doRetrieveMenuByKey(codiceMenu).isAvailable();</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                boolean change=!available;</span>
+<span class="nc" id="L85">                menudao.doUpdateAvailable(codiceMenu,change);</span>
+<span class="nc" id="L86">                listToggleMenu.remove(0);</span>
+<span class="nc" id="L87">            }</span>
+
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            while(!listDeleteMenu.isEmpty())</span>
+            {
+<span class="nc" id="L91">                int codiceMenu=listDeleteMenu.get(0);</span>
+<span class="nc" id="L92">                menudao.doDelete(codiceMenu);</span>
+<span class="nc" id="L93">                listToggleMenu.remove(0);</span>
+<span class="nc" id="L94">            }</span>
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">            while(!listDeletePietanza.isEmpty())</span>
+            {
+<span class="nc" id="L98">                String nomePietanza=listDeletePietanza.get(0);</span>
+<span class="nc" id="L99">                pietanzaDao.doDelete(nomePietanza);</span>
+<span class="nc" id="L100">                listDeletePietanza.remove(0);</span>
+<span class="nc" id="L101">            }</span>
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            while(!listUpdateMensa.isEmpty())</span>
+            {
+<span class="nc" id="L105">                String posti=listUpdateMensa.get(0);</span>
+<span class="nc" id="L106">                String apertura=listUpdateMensa.get(1);</span>
+<span class="nc" id="L107">                String chiusura=listUpdateMensa.get(2);</span>
+<span class="nc" id="L108">                dao.doUpdate(&quot;mensa1&quot;,Integer.parseInt(posti), Time.valueOf(apertura),Time.valueOf(chiusura));</span>
+<span class="nc" id="L109">                listUpdateMensa.clear();</span>
+<span class="nc" id="L110">            }</span>
+        }
+<span class="nc" id="L112">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MensaDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">MensaDAO.java</span></div><h1>MensaDAO.java</h1><pre class="source lang-java linenums">package model;
+
+import java.sql.*;
+import java.util.ArrayList;
+
+/**
+ * Questa classe DAO implementa un'interfaccia per l'interrogazione al database per i metodi maggiormente usati di Mensa
+ */
+<span class="fc" id="L9">public class MensaDAO implements MensaDAOInterface</span>
+{
+
+    /** Restituisce la mensa con la chiave specificata, se presente, altrimenti restituisce un oggetto lista vuoto.
+     * @pre {@literal nome!=null}
+     * @post {@literal List=mensa-&gt;select(m|m.nome=nome)-&gt;asSet()}
+     * @param nome Il nome della mensa. La indentifica univocamente.
+     * @return Una lista con, in ordine, nome, posti disponibili, orario apertura e orario chiusura.
+     */
+    public ArrayList&lt;String&gt; doRetrieveMensaByKey(String nome)
+    {
+<span class="fc" id="L20">        ArrayList&lt;String&gt; cat = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L21">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L23">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L24">                    (&quot;SELECT * FROM mensa WHERE nome=?&quot;);</span>
+<span class="fc" id="L25">            ps.setString(1, nome);</span>
+<span class="fc" id="L26">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">            while (rs.next())</span>
+            {
+<span class="fc" id="L29">                cat.add(rs.getString(1));</span>
+<span class="fc" id="L30">                cat.add(String.valueOf(rs.getInt(2)));</span>
+<span class="fc" id="L31">                cat.add(String.valueOf(rs.getTime(3)));</span>
+<span class="fc" id="L32">                cat.add(String.valueOf(rs.getTime(4)));</span>
+            }
+<span class="fc" id="L34">            return cat;</span>
+<span class="nc" id="L35">        } catch (SQLException e) {</span>
+<span class="nc" id="L36">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /**
+     * @pre {@literal temp.nome!=null &amp;&amp; temp.postiDisponibili!=null &amp;&amp; temp.orarioApertura!=null &amp;&amp; temp.orarioChiusura!=null
+     * &amp;&amp; mensa-&gt;exists(m|m.nome=temp.nome)}
+     * @post {@literal mensa-&gt;includes(temp)}
+     * Mensa con nuove informazioni da aggiornare.
+     * @param nome Il nome della mensa.
+     * @param postiDisponibili Il numero di posti disponibili in mensa.
+     * @param orarioApertura L'orario di apertura della mensa.
+     * @param orarioChiusura L'orario di chiusura della mensa.
+     */
+
+    public void doUpdate(String nome, int postiDisponibili, Time orarioApertura, Time orarioChiusura)
+    {
+<span class="fc" id="L53">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L55">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L56">                    (&quot;UPDATE mensa SET postiDisponibili=?, orarioApertura=?, orarioChiusura=? WHERE nome=?&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L58">            ps.setInt(1, postiDisponibili);</span>
+<span class="fc" id="L59">            ps.setTime(2, orarioApertura);</span>
+<span class="fc" id="L60">            ps.setTime(3, orarioChiusura);</span>
+<span class="fc" id="L61">            ps.setString(4,nome);</span>
+<span class="fc" id="L62">            ps.executeUpdate();</span>
+
+<span class="nc" id="L64">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L66">            throw new RuntimeException(e);</span>
+<span class="fc" id="L67">        }</span>
+<span class="fc" id="L68">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

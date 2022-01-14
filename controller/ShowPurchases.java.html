@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShowPurchases.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ShowPurchases.java</span></div><h1>ShowPurchases.java</h1><pre class="source lang-java linenums">package controller;
+
+import model.*;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+
+/**
+ * Classe che mostra tutti gli acquisti effettuati da un utente.
+ */
+@WebServlet(name=&quot;ShowPurchases&quot;, value=&quot;/ShowPurchases&quot;)
+public class ShowPurchases extends HttpServlet
+{
+    /**
+     * DAO di Menu
+     */
+    private final MenuDAOInterface menudao;
+
+    /**
+     * DAO di Acquisto
+     */
+    private final AcquistoDAOInterface acquistodao;
+
+
+    /**
+     * Costruttore Vuoto
+     */
+    public ShowPurchases() {
+<span class="nc" id="L36">        super();</span>
+<span class="nc" id="L37">        acquistodao=new AcquistoDAO();</span>
+<span class="nc" id="L38">        menudao=new MenuDAO();</span>
+<span class="nc" id="L39">    }</span>
+
+    /**Costruttore con parametri
+     * @param acquistodao DAO di Acquisto
+     */
+    public ShowPurchases(AcquistoDAOInterface acquistodao,MenuDAOInterface menudao) {
+<span class="nc" id="L45">        super();</span>
+<span class="nc" id="L46">        this.acquistodao=acquistodao;</span>
+<span class="nc" id="L47">        this.menudao=menudao;</span>
+<span class="nc" id="L48">    }</span>
+
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L52">        doGet(request,response);</span>
+<span class="nc" id="L53">    }</span>
+
+    public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L57">        HttpSession session=request.getSession();</span>
+<span class="nc" id="L58">        Utente user= (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if(user==null)</span>
+<span class="nc" id="L60">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else {
+<span class="nc" id="L62">            ArrayList&lt;Acquisto&gt; acquisti = this.showAllAcquisti(user);</span>
+<span class="nc" id="L63">            request.setAttribute(&quot;listaAcquisti&quot;, acquisti);</span>
+<span class="nc" id="L64">            ArrayList&lt;Menu&gt; menu=new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            for(Acquisto x: acquisti)</span>
+            {
+<span class="nc" id="L67">                menu.add(menudao.doRetrieveMenuByKey(x.getCodiceMenu()));</span>
+<span class="nc" id="L68">            }</span>
+<span class="nc" id="L69">            request.setAttribute(&quot;listaMenu&quot;,menu);</span>
+<span class="nc" id="L70">            RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/WEB-INF/results/mensa/showPurchases.jsp&quot;);</span>
+<span class="nc" id="L71">            dispatcher.forward(request, response);</span>
+        }
+<span class="nc" id="L73">    }</span>
+
+    /** Restituisce tutti gli acquisti effettuati da un utente.
+     * @pre {@literal user.CF!=null}
+     * @post {@literal Utente (empty) || utente-&gt;select(u|u.codiceFiscale==CF)}}
+     * @param user Utente
+     * @return lista con tutti gli acquisti effettuati dall'utente
+     */
+    public ArrayList&lt;Acquisto&gt; showAllAcquisti(Utente user)
+    {
+<span class="nc" id="L83">        return (ArrayList&lt;Acquisto&gt;) acquistodao.doRetrieveAllAcquistoByCF(user.getCF());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

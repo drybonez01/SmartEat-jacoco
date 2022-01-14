@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdateMensa.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">UpdateMensa.java</span></div><h1>UpdateMensa.java</h1><pre class="source lang-java linenums">package controller;
+
+import model.*;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Time;
+import java.util.ArrayList;
+
+/**
+ * Classe che aggiorna le informazioni della mensa da parte dell'admin
+ */
+@WebServlet(name = &quot;UpdateMensa&quot;, value = &quot;/UpdateMensa&quot;)
+public class UpdateMensa extends HttpServlet {
+
+    /**
+     * DAO di Mensa
+     */
+    private final MensaDAOInterface mensaDao;
+
+    /**
+     * Costruttore Vuoto
+     */
+    public UpdateMensa() {
+<span class="nc" id="L31">        super();</span>
+<span class="nc" id="L32">        mensaDao=new MensaDAO();</span>
+<span class="nc" id="L33">    }</span>
+
+    /**Costruttore con parametri
+     * @param mensaDao di Mensa
+     */
+    public UpdateMensa(MensaDAOInterface mensaDao) {
+<span class="fc" id="L39">        super();</span>
+<span class="fc" id="L40">        this.mensaDao=mensaDao;</span>
+<span class="fc" id="L41">    }</span>
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L46">        HttpSession session=request.getSession();</span>
+<span class="fc" id="L47">        Utente u= (Utente) session.getAttribute(&quot;utenteSessione&quot;);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(u==null)</span>
+<span class="fc" id="L49">            response.sendRedirect(request.getContextPath()+&quot;/index.jsp&quot;);</span>
+        else{
+<span class="fc" id="L51">        RuoloUtente ruoloUtente = u.isAmministratore();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if(!ruoloUtente.isAdmin())</span>
+<span class="fc" id="L53">            response.sendRedirect(request.getContextPath()+&quot;/toHome&quot;);</span>
+        else
+        {
+            String message;
+<span class="fc" id="L57">            ArrayList&lt;String&gt; mensa= mensaDao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc" id="L58">            int posti = Integer.parseInt(request.getParameter(&quot;postiDisponibili&quot;));</span>
+<span class="fc" id="L59">            Time apertura = Time.valueOf(request.getParameter(&quot;orarioApertura&quot;));</span>
+<span class="fc" id="L60">            Time chiusura = Time.valueOf(request.getParameter(&quot;orarioChiusura&quot;));</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            if(apertura.toString().compareTo(chiusura.toString())&gt;=0)</span>
+            {
+<span class="fc" id="L63">                message=&quot;L'orario di apertura deve essere precedente a quello di chiusura&quot;;</span>
+<span class="fc" id="L64">                request.setAttribute(&quot;message&quot;,message);</span>
+<span class="fc" id="L65">                request.setAttribute(&quot;mensa&quot;,mensa);</span>
+<span class="fc" id="L66">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMensaArea&quot;);</span>
+<span class="fc" id="L67">                dispatcher.forward(request, response);</span>
+<span class="fc" id="L68">            }</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            else if(apertura.toString().compareTo(&quot;01:00:00&quot;)&lt;=0)</span>
+            {
+<span class="fc" id="L71">                message=&quot;L'orario di apertura non può essere precedente alle ore 01:00&quot;;</span>
+<span class="fc" id="L72">                request.setAttribute(&quot;message&quot;,message);</span>
+<span class="fc" id="L73">                request.setAttribute(&quot;mensa&quot;,mensa);</span>
+<span class="fc" id="L74">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMensaArea&quot;);</span>
+<span class="fc" id="L75">                dispatcher.forward(request, response);</span>
+<span class="fc" id="L76">            }</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            else if(chiusura.toString().compareTo(&quot;23:00:00&quot;)&gt;=0)</span>
+            {
+<span class="fc" id="L79">                message=&quot;L'orario di chiusura non può essere successivo alle ore 23:00&quot;;</span>
+<span class="fc" id="L80">                request.setAttribute(&quot;message&quot;,message);</span>
+<span class="fc" id="L81">                request.setAttribute(&quot;mensa&quot;,mensa);</span>
+<span class="fc" id="L82">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMensaArea&quot;);</span>
+<span class="fc" id="L83">                dispatcher.forward(request, response);</span>
+<span class="fc" id="L84">            }</span>
+            else {
+<span class="fc" id="L86">                boolean result = this.updateMensa(posti, apertura, chiusura);</span>
+<span class="fc" id="L87">                mensa = mensaDao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                if (result)</span>
+<span class="fc" id="L89">                    message = &quot;Le informazioni della mensa sono state modificate correttamente&quot;;</span>
+                else
+<span class="fc" id="L91">                    message = &quot;Le informazioni della mensa verranno modificate dopo l'orario di chiusura&quot;;</span>
+<span class="fc" id="L92">                request.setAttribute(&quot;message&quot;, message);</span>
+<span class="fc" id="L93">                request.setAttribute(&quot;mensa&quot;, mensa);</span>
+<span class="fc" id="L94">                RequestDispatcher dispatcher = request.getRequestDispatcher(&quot;/AdminMensaArea&quot;);</span>
+<span class="fc" id="L95">                dispatcher.forward(request, response);</span>
+            }
+            }
+        }
+<span class="fc" id="L99">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+<span class="nc" id="L104">        doGet(request, response);</span>
+<span class="nc" id="L105">    }</span>
+
+
+    /**
+     * Aggiorna le informazioni della mensa quando possibile
+     * @pre {@literal posti!=null &amp;&amp; apertura!=null &amp;&amp; chiusura!=null}
+     * @param posti posti disponibili
+     * @param apertura orario di apertura
+     * @param chiusura orario di chiusura
+     * @return true se la mensa e' stata aggiornata all'istante, false seaggiornata successivamente
+     */
+    public boolean updateMensa(int posti,Time apertura,Time chiusura)
+    {
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (Mensa.isMensaConfig())</span>
+        {
+<span class="fc" id="L120">            mensaDao.doUpdate(&quot;mensa1&quot;,posti,apertura,chiusura);</span>
+<span class="fc" id="L121">            return  true;</span>
+        }
+<span class="fc" id="L123">        ArrayList&lt;String&gt; listupdateMensa= Mensa.getListUpdateMensa();</span>
+<span class="fc" id="L124">        listupdateMensa.add(0,String.valueOf(posti));</span>
+<span class="fc" id="L125">        listupdateMensa.add(1,apertura.toString());</span>
+<span class="fc" id="L126">        listupdateMensa.add(2,chiusura.toString());</span>
+<span class="fc" id="L127">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

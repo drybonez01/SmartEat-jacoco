@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Mensa.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">Mensa.java</span></div><h1>Mensa.java</h1><pre class="source lang-java linenums">package model;
+
+import java.sql.Time;
+import java.util.ArrayList;
+
+/**
+ * La classe modella gli oggetti mensa ed utilizza il Singleton Pattern
+ * @invariant orarioApertura.getTime()-orarioChiusura.getTime(){@literal &lt;}0
+ */
+public class Mensa
+{
+    /**
+     * Il nome della mensa.
+     */
+    private String nome;
+    /**
+     * Il numero di posti prenotabili in un giorno.
+     */
+    private int postiDisponibili;
+    /**
+     * L'orario di apertura della mensa.
+     */
+    private Time orarioApertura;
+    /**
+     * L'orario di chiusura della mensa.
+     */
+    private Time orarioChiusura;
+    /**
+     * Posti attualmente vuoti in mensa.
+     */
+    private static int postiVuoti;
+
+    /**
+     * Istanza privata del Singleton Mensa
+     */
+<span class="fc" id="L36">    public static  Mensa mensa=new Mensa();</span>
+
+    /**
+     *Costruttore privato per realizzare il Singleton Pattern
+     */
+    private Mensa()
+<span class="fc" id="L42">    {</span>
+<span class="fc" id="L43">        MensaDAOInterface dao= new MensaDAO();</span>
+<span class="fc" id="L44">        ArrayList&lt;String&gt; strings=dao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc" id="L45">        this.setNome(strings.get(0));</span>
+<span class="fc" id="L46">        this.setPostiDisponibili(Integer.parseInt(strings.get(1)));</span>
+<span class="fc" id="L47">        this.setOrarioApertura(Time.valueOf(strings.get(2)));</span>
+<span class="fc" id="L48">        this.setOrarioChiusura(Time.valueOf(strings.get(3)));</span>
+<span class="fc" id="L49">    }</span>
+
+
+    /** Restituisce il nome della mensa.
+     * @return
+     * Restituisce il nome della mensa.
+     */
+<span class="fc" id="L56">    public String getNome() {return nome;}</span>
+
+
+    /**
+     * Imposta il nome della mensa.
+     * @param nome nome della mensa
+     */
+<span class="fc" id="L63">    public void setNome(String nome) {this.nome = nome;}</span>
+
+
+    /**
+     * ArrayList di servizio per aggiornare la mensa
+     */
+<span class="fc" id="L69">    private static ArrayList&lt;String&gt; listUpdateMensa=new ArrayList&lt;&gt;();</span>
+
+
+
+    /** Restituisce il numero di posti disponibili.
+     * @return
+     *Restituisce il numero di posti disponibili.
+     */
+<span class="fc" id="L77">    public int getPostiDisponibili() {return postiDisponibili;}</span>
+
+
+    /**
+     * Imposta il numero di posti disponibili.
+     * @param postiDisponibili numero di posti disponibili.
+     */
+<span class="fc" id="L84">    public void setPostiDisponibili(int postiDisponibili) {this.postiDisponibili = postiDisponibili;}</span>
+
+
+    /** Restituisce l'orario di apertura.
+     * @return
+     * Restituisce l'orario di apertura.
+     */
+<span class="fc" id="L91">    public Time getOrarioApertura() {return orarioApertura;}</span>
+
+
+    /**
+     * Imposta l'orario di apertura.
+     * @param orarioApertura orario di apertura.
+     */
+<span class="fc" id="L98">    public void setOrarioApertura(Time orarioApertura) {this.orarioApertura = orarioApertura;}</span>
+
+
+    /** Restituisce l'orario di chiusura.
+     * @return
+     * Restituisce l'orario di chiusura.
+     */
+<span class="fc" id="L105">    public Time getOrarioChiusura() {return orarioChiusura;}</span>
+
+
+    /**
+     * Imposta l'orario di chiusura.
+     * @param orarioChiusura orario di chiusura.
+     */
+<span class="fc" id="L112">    public void setOrarioChiusura(Time orarioChiusura) {this.orarioChiusura = orarioChiusura;}</span>
+
+    /** Restituisce i posti attualmente vuoti in mensa
+     *
+     * @return posti ancora vuoti in mensa
+     */
+    public static int getPostiVuoti() {
+<span class="fc" id="L119">        return postiVuoti;</span>
+    }
+
+    /** Imposta i posti attualmente vuoti in mensa
+     *
+     * @param postiVuoti posti ancora vuoti in mensa
+     */
+    public static void setPostiVuoti(int postiVuoti) {
+<span class="nc" id="L127">        Mensa.postiVuoti = postiVuoti;</span>
+<span class="nc" id="L128">    }</span>
+
+
+    /**
+     * restituisce i dati da aggiornare della mensa
+     * @return lista di informazioni della mensa
+     */
+<span class="nc" id="L135">    public static ArrayList&lt;String&gt; getListUpdateMensa() {return listUpdateMensa;}</span>
+
+
+    /** Verifica se e' possibile effettuare modifiche al sistema.
+     * @return true se e' possibile modificare il sistema, altrimenti false
+     */
+    public static boolean isMensaConfig()
+    {
+<span class="nc" id="L143">        MensaDAOInterface mensadao=new MensaDAO();</span>
+<span class="nc" id="L144">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="nc" id="L145">        Time chiusura= Time.valueOf(mensa.get(3));</span>
+<span class="nc" id="L146">        Time config=Time.valueOf(&quot;23:59:59&quot;);</span>
+<span class="nc" id="L147">        Time attuale= new Time(System.currentTimeMillis());</span>
+
+<span class="nc" id="L149">        String chiusuraString=chiusura.toString();</span>
+<span class="nc" id="L150">        String confiString=config.toString();</span>
+<span class="nc" id="L151">        String attualeString=attuale.toString();</span>
+
+<span class="nc bnc" id="L153" title="All 4 branches missed.">        return attualeString.compareTo(chiusuraString)&gt;0 &amp;&amp; attualeString.compareTo(confiString)&lt;=0;</span>
+    }
+
+    /** Verifica se e' possibile effettuare acquisti o rimborsi.
+     * @return true se e' possibile effettuare acquisti o rimborsi, altrimenti false
+     */
+    public static boolean isMensaPurchase()
+    {
+<span class="nc" id="L161">        MensaDAOInterface mensadao=new MensaDAO();</span>
+<span class="nc" id="L162">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="nc" id="L163">        Time apertura= Time.valueOf(mensa.get(2));</span>
+<span class="nc" id="L164">        Time attuale= new Time(System.currentTimeMillis());</span>
+
+<span class="nc" id="L166">        String aperturaString=apertura.toString();</span>
+<span class="nc" id="L167">        String attualeString=attuale.toString();</span>
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        return attualeString.compareTo(aperturaString)&lt;0;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

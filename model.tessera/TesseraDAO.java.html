@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TesseraDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SmartEat</a> &gt; <a href="index.source.html" class="el_package">model.tessera</a> &gt; <span class="el_source">TesseraDAO.java</span></div><h1>TesseraDAO.java</h1><pre class="source lang-java linenums">package model.tessera;
+
+import model.utils.ConPool;
+
+import java.sql.*;
+
+/**
+ * Questa classe DAO implementa un'interfaccia per l'interrogazione al database per i metodi maggiormente usati di Tessera
+ */
+<span class="fc" id="L10">public class TesseraDAO implements TesseraDAOInterface</span>
+{
+    /** Restituisce la tessera con la chiave richiesta, se presente, altrimenti restituisce un oggetto Tessera vuoto.
+     * @pre {@literal CF!=null}
+     * @post {@literal Tessera (empty) || tessera-&gt;select(t|t.codiceFiscale==CF)}
+     * @param CF Codice fiscale. Identifica univocamente una tessera.
+     * @return Tessera con la chiave richiesta
+     */
+    public Tessera doRetrieveTesseraByKey(String CF)
+    {
+<span class="fc" id="L20">        Tessera t = new Tessera();</span>
+<span class="fc" id="L21">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L23">            PreparedStatement ps = con.prepareStatement(&quot;SELECT * FROM tessera WHERE codiceFiscale=?&quot;);</span>
+<span class="fc" id="L24">            ps.setString(1, CF);</span>
+<span class="fc" id="L25">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L27">                t.setCF(rs.getString(1));</span>
+<span class="fc" id="L28">                t.setSaldo(rs.getFloat(2));</span>
+            }
+<span class="fc" id="L30">            return t;</span>
+<span class="nc" id="L31">        } catch (SQLException e) {</span>
+<span class="nc" id="L32">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /** Salva una tessera in database
+     * @pre {@literal t.codiceFiscale!=null &amp;&amp; t.saldo!=null &amp;&amp; !(tessera-&gt;includes(t))}
+     * @post {@literal tessera-&gt;includes(t)}
+     * @param t Tessera da salvare in database
+     */
+    public void doSave(Tessera t)
+    {
+<span class="fc" id="L43">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L45">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L46">                    (&quot;INSERT INTO tessera (codiceFiscale, saldo) VALUES(?,?)&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L48">            ps.setString(1, t.getCF());</span>
+<span class="fc" id="L49">            ps.setFloat(2,t.getSaldo());</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="nc" id="L52">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="fc" id="L54">        } catch (SQLException e) {</span>
+<span class="fc" id="L55">            throw new RuntimeException(e);</span>
+<span class="fc" id="L56">        }</span>
+<span class="fc" id="L57">    }</span>
+
+    /** Elimina la tessera con una chiave
+     * @pre {@literal CF!=null &amp;&amp; tessera-&gt;exists(t|t.codiceFiscale==CF)}
+     * @post {@literal !(tessera-&gt;exists(t|t.codiceFiscale==CF))}
+     * @param CF codice fiscale della tessera da eliminare
+     */
+    public void doDelete(String CF)
+    {
+<span class="fc" id="L66">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L68">            PreparedStatement ps = con.prepareStatement</span>
+<span class="fc" id="L69">                    (&quot;Delete FROM tessera WHERE codiceFiscale=?&quot;,</span>
+                            Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L71">            ps.setString(1, CF);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (ps.executeUpdate() != 1)</span>
+            {
+<span class="fc" id="L74">                throw new RuntimeException(&quot;INSERT error.&quot;);</span>
+            }
+<span class="nc" id="L76">        } catch (SQLException e) {</span>
+<span class="nc" id="L77">            throw new RuntimeException(e);</span>
+<span class="fc" id="L78">        }</span>
+<span class="fc" id="L79">    }</span>
+
+    /** Aggiorna le informazioni di una tessera
+     * @pre {@literal t.codiceFiscale!=null &amp;&amp; t.saldo!=null &amp;&amp; tessera-&gt;exists(tes|tes.codiceFiscale==t.codiceFiscale)}
+     * @post {@literal tessera-&gt;includes(t)}
+     * @param t tessera con le informazioni aggiornate
+     */
+    public void doUpdate(Tessera t)
+    {
+<span class="fc" id="L88">        try (Connection con = ConPool.getConnection())</span>
+        {
+<span class="fc" id="L90">            PreparedStatement ps = con.prepareStatement(&quot;UPDATE tessera SET saldo=? WHERE codiceFiscale=?&quot;,</span>
+                    Statement.RETURN_GENERATED_KEYS);
+<span class="fc" id="L92">            ps.setFloat(1, t.getSaldo());</span>
+<span class="fc" id="L93">            ps.setString(2, t.getCF());</span>
+
+<span class="fc" id="L95">            ps.executeUpdate();</span>
+
+<span class="nc" id="L97">        } catch (SQLException e)</span>
+        {
+<span class="nc" id="L99">            throw new RuntimeException(e);</span>
+<span class="fc" id="L100">        }</span>
+<span class="fc" id="L101">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
