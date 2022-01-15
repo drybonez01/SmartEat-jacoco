@@ -58,7 +58,7 @@ public class UpdateMensa extends HttpServlet {
         else
         {
             String message;
-<span class="fc" id="L61">            ArrayList&lt;String&gt; mensa= mensaDao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc" id="L61">            ArrayList&lt;String&gt; mensa= mensaDao.doRetrieveMensaByKey(&quot;SmartEat&quot;);</span>
 <span class="fc" id="L62">            int posti = Integer.parseInt(request.getParameter(&quot;postiDisponibili&quot;));</span>
 <span class="fc" id="L63">            Time apertura = Time.valueOf(request.getParameter(&quot;orarioApertura&quot;));</span>
 <span class="fc" id="L64">            Time chiusura = Time.valueOf(request.getParameter(&quot;orarioChiusura&quot;));</span>
@@ -88,7 +88,7 @@ public class UpdateMensa extends HttpServlet {
 <span class="fc" id="L88">            }</span>
             else {
 <span class="fc" id="L90">                boolean result = this.updateMensa(posti, apertura, chiusura);</span>
-<span class="fc" id="L91">                mensa = mensaDao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc" id="L91">                mensa = mensaDao.doRetrieveMensaByKey(&quot;SmartEat&quot;);</span>
 <span class="fc bfc" id="L92" title="All 2 branches covered.">                if (result)</span>
 <span class="fc" id="L93">                    message = &quot;Le informazioni della mensa sono state modificate correttamente&quot;;</span>
                 else
@@ -121,7 +121,7 @@ public class UpdateMensa extends HttpServlet {
     {
 <span class="fc bfc" id="L122" title="All 2 branches covered.">        if (Mensa.isMensaConfig())</span>
         {
-<span class="fc" id="L124">            mensaDao.doUpdate(&quot;mensa1&quot;,posti,apertura,chiusura);</span>
+<span class="fc" id="L124">            mensaDao.doUpdate(&quot;SmartEat&quot;,posti,apertura,chiusura);</span>
 <span class="fc" id="L125">            return  true;</span>
         }
 <span class="fc" id="L127">        ArrayList&lt;String&gt; listupdateMensa= Mensa.getListUpdateMensa();</span>

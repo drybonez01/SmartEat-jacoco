@@ -41,7 +41,7 @@ public class Mensa
     private Mensa()
 <span class="fc" id="L42">    {</span>
 <span class="fc" id="L43">        MensaDAOInterface dao= new MensaDAO();</span>
-<span class="fc" id="L44">        ArrayList&lt;String&gt; strings=dao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="fc" id="L44">        ArrayList&lt;String&gt; strings=dao.doRetrieveMensaByKey(&quot;SmartEat&quot;);</span>
 <span class="fc" id="L45">        this.setNome(strings.get(0));</span>
 <span class="fc" id="L46">        this.setPostiDisponibili(Integer.parseInt(strings.get(1)));</span>
 <span class="fc" id="L47">        this.setOrarioApertura(Time.valueOf(strings.get(2)));</span>
@@ -141,7 +141,7 @@ public class Mensa
     public static boolean isMensaConfig()
     {
 <span class="nc" id="L143">        MensaDAOInterface mensadao=new MensaDAO();</span>
-<span class="nc" id="L144">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="nc" id="L144">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;SmartEat&quot;);</span>
 <span class="nc" id="L145">        Time chiusura= Time.valueOf(mensa.get(3));</span>
 <span class="nc" id="L146">        Time config=Time.valueOf(&quot;23:59:59&quot;);</span>
 <span class="nc" id="L147">        Time attuale= new Time(System.currentTimeMillis());</span>
@@ -159,7 +159,7 @@ public class Mensa
     public static boolean isMensaPurchase()
     {
 <span class="nc" id="L161">        MensaDAOInterface mensadao=new MensaDAO();</span>
-<span class="nc" id="L162">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;mensa1&quot;);</span>
+<span class="nc" id="L162">        ArrayList&lt;String&gt; mensa=mensadao.doRetrieveMensaByKey(&quot;SmartEat&quot;);</span>
 <span class="nc" id="L163">        Time apertura= Time.valueOf(mensa.get(2));</span>
 <span class="nc" id="L164">        Time attuale= new Time(System.currentTimeMillis());</span>
 
